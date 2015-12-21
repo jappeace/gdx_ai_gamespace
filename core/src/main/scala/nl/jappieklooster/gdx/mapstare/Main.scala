@@ -3,7 +3,6 @@ package nl.jappieklooster.gdx.mapstare
 import com.badlogic.gdx.{InputProcessor, Input, ApplicationAdapter, Gdx}
 import com.badlogic.gdx.graphics.{OrthographicCamera, Color, GL20, Texture}
 import com.badlogic.gdx.graphics.g2d.{BitmapFont, SpriteBatch}
-import nl.jappieklooster.gdx.mapstare.input.MouseTracker
 import com.badlogic.gdx.math.Vector3
 
 class Main extends ApplicationAdapter {
@@ -11,10 +10,8 @@ class Main extends ApplicationAdapter {
 	lazy val img:Texture = new Texture("badlogic.jpg")
 
 	lazy val font = new BitmapFont()
-	val mousetracker = new MouseTracker()
 	override def create() = {
 		font.setColor(Color.BLACK)
-		Gdx.input.setInputProcessor(mousetracker)
 	}
 
 	var x = 0.1f
