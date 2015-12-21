@@ -41,10 +41,11 @@ project(":desktop") {
 }
 
 project(":core") {
-    apply plugin: "java"
+    apply plugin: "scala"
 
 
     dependencies {
+		compile "org.scala-lang:scala-library-all:2.11.7"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
     }
