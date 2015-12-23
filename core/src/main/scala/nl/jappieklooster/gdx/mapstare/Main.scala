@@ -1,17 +1,22 @@
 package nl.jappieklooster.gdx.mapstare
 
+import com.badlogic.gdx.maps.tiled.TmxMapLoader
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.{InputProcessor, Input, ApplicationAdapter, Gdx}
 import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.g2d.{BitmapFont, SpriteBatch}
 import com.badlogic.gdx.math.Vector3
+import nl.jappieklooster.gdx.mapstare.input.CamController
 
-class Main extends ApplicationAdapter {
+class Main() extends ApplicationAdapter {
 	lazy val batch = new SpriteBatch()
 	lazy val img = new Texture("badlogic.jpg")
 
 	lazy val text = new Pixmap(40,40, Pixmap.Format.RGBA8888)
 	lazy val custom = new Texture(text)
 	lazy val font = new BitmapFont()
+	lazy val maprendeer = new OrthogonalTiledMapRenderer(new TmxMapLoader().load("map.tmx"))
+	lazy val cam = Cam.cam
 	override def create() = {
 		font.setColor(Color.BLACK)
 
@@ -19,16 +24,18 @@ class Main extends ApplicationAdapter {
 		text.drawLine(0,4,40,40)
 		text.drawLine(3,5,40,40)
 		text.drawLine(4,10,40,40)
+		Gdx.input.setInputProcessor(new CamController())
 	}
 
 	var x = 0.1f
-	lazy val cam = new OrthographicCamera(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
 	var positions = List[(Texture,Float,Float)]()
 	override def render() = {
-		val pos = cam.unproject(new Vector3(Gdx.input.getX + Gdx.graphics.getWidth/2, Gdx.input.getY - Gdx.graphics.getHeight/2, 0))
+		val pos = cam.mouseScreenPos()
 		x += 0.1f
 		Gdx.gl.glClearColor(1, 1, 0, 1)
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+		maprendeer.setView(cam.cam)
+		maprendeer.render()
 		batch.begin()
 		batch.draw(img, x, 0)
 		font.draw(batch, s"aaah", x, 2*x)
@@ -43,5 +50,6 @@ class Main extends ApplicationAdapter {
 			batch.draw(pos._1, pos._2, pos._3)
 		}
 		batch.end()
+		cam.cam.update()
 	}
 }
