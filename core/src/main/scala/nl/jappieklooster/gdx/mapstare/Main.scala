@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.{InputMultiplexer, Input, ApplicationAdapter, Gdx}
 import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, BitmapFont}
-import nl.jappieklooster.gdx.mapstare.input.CamController
+import nl.jappieklooster.gdx.mapstare.input.{OnClick, CamController}
 import nl.jappieklooster.gdx.mapstare.model._
 import nl.jappieklooster.gdx.mapstare.view.Animation
 
@@ -21,7 +21,7 @@ class Main() extends ApplicationAdapter {
 	lazy val maprendeer = new OrthogonalTiledMapRenderer(new TmxMapLoader().load("map.tmx"))
 	lazy val cam = Cam.cam
 	lazy val stage = new Stage(new ScreenViewport(), batch)
-	lazy val swordman = Animation.create(0.2f, 4, 227, 320, "swordman.png", Swordman(Tile(10,10)))
+	lazy val swordmanFactory = Animation.create(0.2f, 4, 227, 320, "swordman.png") _
 	lazy val controller = new CamController()
 
 	lazy val skin = new Skin(Gdx.files.internal("uiskin.json"))
@@ -32,17 +32,15 @@ class Main() extends ApplicationAdapter {
 		button.setWidth(200)
 		button.setHeight(50)
 		val dialog = new Dialog("click message", skin)
-		dialog.addListener(new ClickListener(){
-			override def clicked(event:InputEvent, x:Float, y:Float):Unit = {
+		dialog.addListener(OnClick(() => {
 				dialog.hide()
 			}
-		})
-		button.addListener(new ClickListener(){
-			override def clicked(event:InputEvent, x:Float, y:Float):Unit = {
+		))
+		button.addListener(OnClick(() => {
 				println("clicked??")
 				dialog.show(stage)
 			}
-		})
+		))
 		Gdx.input.setInputProcessor(new InputMultiplexer(controller, stage))
 
 		val scrolltable = new Table(skin)
@@ -52,11 +50,10 @@ class Main() extends ApplicationAdapter {
 		container.row()
 		container.add(button)
 		val label = new TextButton("blah", skin, "default")
-		label.addListener(new ClickListener(){
-			override def clicked(event:InputEvent, x:Float, y:Float):Unit = {
+		label.addListener(OnClick(()=> {
 				println("clicke blah")
 			}
-		})
+		))
 		scrolltable.add(label)
 		scrolltable.row()
 		scrolltable.add("bleh")
@@ -76,19 +73,21 @@ class Main() extends ApplicationAdapter {
 	}
 
 	var x = 0
+	def update(timeSinceLast:Float): Unit ={
+		controller.update(timeSinceLast)
+		cam.cam.update()
+	}
 	override def render() = {
+		update(Gdx.graphics.getDeltaTime)
+
 		val pos = cam.mouseScreenPos()
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-		cam.cam.update()
 		maprendeer.setView(cam.cam)
 		maprendeer.render()
 		batch.begin()
 		if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
 			font.draw(batch, s"(${pos.x},${pos.y})", pos.x,  pos.y  )
 		}
-		swordman.update(Gdx.graphics.getDeltaTime)
-		swordman.render(batch)
-		controller.update(Gdx.graphics.getDeltaTime)
 		batch.end()
 		stage.act(Gdx.graphics.getDeltaTime)
 		stage.draw()

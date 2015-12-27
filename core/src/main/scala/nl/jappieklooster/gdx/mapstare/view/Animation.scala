@@ -34,7 +34,7 @@ class Animation(frametime:Float, sprites:Seq[Sprite], entity: Entity, cam:Cam) e
 }
 
 object Animation{
-	def create(frametime:Float, frameCount:Int, frameWidth:Int, frameHeight:Int, texture:String, entity: Entity )(implicit cam:Cam) = {
+	def create(frametime:Float, frameCount:Int, frameWidth:Int, frameHeight:Int, texture:String)(entity: Entity)(implicit cam:Cam) = {
 		val spritesheet = new Texture(Gdx.files.internal(texture))
 		new Animation(
 			frametime,
