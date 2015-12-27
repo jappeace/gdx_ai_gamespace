@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.{InputMultiplexer, Input, ApplicationAdapter, Gdx}
 import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, BitmapFont}
-import nl.jappieklooster.gdx.mapstare.input.{InputAdapter, OnClick, CamController}
+import nl.jappieklooster.gdx.mapstare.input.{ClickController, InputAdapter, OnClick, CamController}
 import nl.jappieklooster.gdx.mapstare.model._
 import nl.jappieklooster.gdx.mapstare.view.Animation
 
@@ -54,44 +54,13 @@ class Main() extends ApplicationAdapter {
 		container.row()
 		container.add(button)
 		val label = new TextButton("Swordman", skin, "default")
-		label.addListener(OnClick(()=> {
-				def screenToTile(screen:Vector3) =
-					Tile.fromPixels(screen) + cam.getPosition - Tile(3,4)
-				plexer.addProcessor(new InputAdapter {
-					override def touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
-						button match{
-							case Buttons.LEFT =>
-								println(s"left ($screenX, $screenY)")
-								animations = animations :+ swordmanFactory(
-									Swordman(
-										screenToTile(
-											new Vector3(
-												screenX,
-												Gdx.graphics.getHeight - screenY,
-												0
-											)
-										)
-									)
-								)
-								true
-							case Buttons.RIGHT =>
-								mouseAnimation = None
-								plexer.removeProcessor(this)
-								true
-							case _ => false
-						}
-					}
-				})
-				mouseAnimation = Some(
-					swordmanFactory(new Entity {
-						override def getPosition:Tile = {
-							screenToTile(cam.mouseScreenPos())
-						}
-					}
-					)
-				)
-			}
-		))
+		label.addListener(
+			new ClickController(plexer,
+				factory = swordmanFactory,
+				placeCallback = a=> animations = animations :+ a,
+				followCallback = a=> mouseAnimation=a
+			)
+		)
 		scrolltable.add(label)
 		scrolltable.row()
 		scrolltable.add("Horseman")
