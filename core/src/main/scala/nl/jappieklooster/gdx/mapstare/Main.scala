@@ -62,7 +62,17 @@ class Main() extends ApplicationAdapter {
 						button match{
 							case Buttons.LEFT =>
 								println(s"left ($screenX, $screenY)")
-								animations = animations :+ swordmanFactory(Swordman(screenToTile(new Vector3(screenX, Gdx.graphics.getHeight - screenY, 0))))
+								animations = animations :+ swordmanFactory(
+									Swordman(
+										screenToTile(
+											new Vector3(
+												screenX,
+												Gdx.graphics.getHeight - screenY,
+												0
+											)
+										)
+									)
+								)
 								true
 							case Buttons.RIGHT =>
 								mouseAnimation = None
