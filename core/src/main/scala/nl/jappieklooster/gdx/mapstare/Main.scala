@@ -23,8 +23,10 @@ class Main() extends ApplicationAdapter {
 	lazy val stage = new Stage(new ScreenViewport(), batch)
 	lazy val swordman = Animation.create(0.2f, 4, 227, 320, "swordman.png", Swordman(Tile(10,10)))
 	lazy val controller = new CamController()
+
+	lazy val skin = new Skin(Gdx.files.internal("uiskin.json"))
+	lazy val container = new Table(skin)
 	override def create() = {
-		val skin = new Skin(Gdx.files.internal("uiskin.json"))
 		font.setColor(Color.BLACK)
 		val button = new TextButton("Click me", skin, "default")
 		button.setWidth(200)
@@ -90,5 +92,10 @@ class Main() extends ApplicationAdapter {
 		batch.end()
 		stage.act(Gdx.graphics.getDeltaTime)
 		stage.draw()
+	}
+	override def resize (width:Int, height:Int):Unit = {
+		println("resize")
+		cam.toOrtho(width, height)
+		stage.getViewport.update(width, height, true)
 	}
 }
