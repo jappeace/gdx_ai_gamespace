@@ -13,7 +13,7 @@ class Cam {
 	val cam = new OrthographicCamera()
 	cam.setToOrtho(false, Gdx.graphics.getWidth, Gdx.graphics.getHeight)
 	private var position = Tile.zero
-	def move(direction: Direction): Unit ={
+	def move(direction: Vector2): Unit ={
 		position = Tile.fromVector(direction.add(position))
 		cam.translate(direction.scl(Tile.width, Tile.height))
 	}

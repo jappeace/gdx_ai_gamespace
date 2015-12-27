@@ -4,7 +4,7 @@ import com.badlogic.gdx.InputProcessor;
 /**
  * Just implement everyting with false so other processers have less boilerplate
  */
-class NotAnInputProcessor extends InputProcessor{
+trait InputAdapter extends InputProcessor{
 	override def keyTyped(character: Char): Boolean = false
 	override def mouseMoved(screenX: Int, screenY: Int): Boolean = false
 	override def keyDown(keycode: Int): Boolean = false

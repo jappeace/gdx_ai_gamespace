@@ -21,6 +21,7 @@ class Main() extends ApplicationAdapter {
 	lazy val cam = Cam.cam
 	lazy val stage = new Stage(new ScreenViewport())
 	lazy val swordman = Animation.create(0.2f, 4, 227, 320, "swordman.png")
+	lazy val controller = new CamController()
 	override def create() = {
 		val skin = new Skin(Gdx.files.internal("uiskin.json"))
 		font.setColor(Color.BLACK)
@@ -39,7 +40,7 @@ class Main() extends ApplicationAdapter {
 				dialog.show(stage)
 			}
 		})
-		Gdx.input.setInputProcessor(new InputMultiplexer(new CamController(), stage))
+		Gdx.input.setInputProcessor(new InputMultiplexer(controller, stage))
 
 		val scrolltable = new Table(skin)
 		val scrollpane = new ScrollPane(scrolltable, skin, "default")
@@ -82,7 +83,9 @@ class Main() extends ApplicationAdapter {
 		if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
 			font.draw(batch, s"(${pos.x},${pos.y})", pos.x,  pos.y  )
 		}
-		swordman.render(batch, Gdx.graphics.getDeltaTime)
+		controller.update(Gdx.graphics.getDeltaTime)
+		swordman.update(Gdx.graphics.getDeltaTime)
+		swordman.render(batch)
 		batch.end()
 		stage.act(Gdx.graphics.getDeltaTime)
 		stage.draw()
