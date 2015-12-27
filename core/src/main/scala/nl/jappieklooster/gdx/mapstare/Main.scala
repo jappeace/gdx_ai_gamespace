@@ -13,6 +13,7 @@ import nl.jappieklooster.gdx.mapstare.input.{OnClick, CamController}
 import nl.jappieklooster.gdx.mapstare.model._
 import nl.jappieklooster.gdx.mapstare.view.Animation
 
+import com.badlogic.gdx.math._
 
 class Main() extends ApplicationAdapter {
 	lazy val batch = new SpriteBatch()
@@ -26,6 +27,7 @@ class Main() extends ApplicationAdapter {
 
 	lazy val skin = new Skin(Gdx.files.internal("uiskin.json"))
 	lazy val container = new Table(skin)
+	var mouseAnimation:Option[Animation] = None
 	override def create() = {
 		font.setColor(Color.BLACK)
 		val button = new TextButton("Click me", skin, "default")
@@ -49,9 +51,17 @@ class Main() extends ApplicationAdapter {
 		container.add(scrollpane).width(200).height(100)
 		container.row()
 		container.add(button)
-		val label = new TextButton("blah", skin, "default")
+		val label = new TextButton("Swordman", skin, "default")
 		label.addListener(OnClick(()=> {
 				println("clicke blah")
+				mouseAnimation = Some(
+					swordmanFactory(new Entity {
+						override def getPosition:Tile = {
+							Tile.fromPixels(cam.mouseScreenPos()) + cam.getPosition - Tile(3,4)
+						}
+					}
+					)
+				)
 			}
 		))
 		scrolltable.add(label)
@@ -76,6 +86,9 @@ class Main() extends ApplicationAdapter {
 	def update(timeSinceLast:Float): Unit ={
 		controller.update(timeSinceLast)
 		cam.cam.update()
+		for(animation <- mouseAnimation){
+			animation.update(timeSinceLast)
+		}
 	}
 	override def render() = {
 		update(Gdx.graphics.getDeltaTime)
@@ -87,6 +100,9 @@ class Main() extends ApplicationAdapter {
 		batch.begin()
 		if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
 			font.draw(batch, s"(${pos.x},${pos.y})", pos.x,  pos.y  )
+		}
+		for(animation <- mouseAnimation){
+			animation.render(batch)
 		}
 		batch.end()
 		stage.act(Gdx.graphics.getDeltaTime)

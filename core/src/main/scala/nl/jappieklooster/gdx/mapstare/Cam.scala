@@ -14,6 +14,7 @@ class Cam {
 	private var position = Tile.zero
 	private var positionChange = Tile.zero
 	toOrtho(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
+	def getPosition = position
 	def move(direction: Vector2): Unit ={
 		positionChange = Tile.fromVector(direction.add(positionChange))
 		position += positionChange
