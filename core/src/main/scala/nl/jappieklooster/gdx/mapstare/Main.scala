@@ -86,9 +86,9 @@ class Main() extends ApplicationAdapter {
 		if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
 			font.draw(batch, s"(${pos.x},${pos.y})", pos.x,  pos.y  )
 		}
-		controller.update(Gdx.graphics.getDeltaTime)
 		swordman.update(Gdx.graphics.getDeltaTime)
 		swordman.render(batch)
+		controller.update(Gdx.graphics.getDeltaTime)
 		batch.end()
 		stage.act(Gdx.graphics.getDeltaTime)
 		stage.draw()
