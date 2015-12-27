@@ -10,6 +10,7 @@ import com.badlogic.gdx.{InputMultiplexer, Input, ApplicationAdapter, Gdx}
 import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, BitmapFont}
 import nl.jappieklooster.gdx.mapstare.input.CamController
+import nl.jappieklooster.gdx.mapstare.model._
 import nl.jappieklooster.gdx.mapstare.view.Animation
 
 
@@ -19,8 +20,8 @@ class Main() extends ApplicationAdapter {
 	lazy val font = new BitmapFont()
 	lazy val maprendeer = new OrthogonalTiledMapRenderer(new TmxMapLoader().load("map.tmx"))
 	lazy val cam = Cam.cam
-	lazy val stage = new Stage(new ScreenViewport())
-	lazy val swordman = Animation.create(0.2f, 4, 227, 320, "swordman.png")
+	lazy val stage = new Stage(new ScreenViewport(), batch)
+	lazy val swordman = Animation.create(0.2f, 4, 227, 320, "swordman.png", Swordman(Tile(10,10)))
 	lazy val controller = new CamController()
 	override def create() = {
 		val skin = new Skin(Gdx.files.internal("uiskin.json"))

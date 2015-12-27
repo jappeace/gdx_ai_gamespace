@@ -15,11 +15,13 @@ class Cam {
 	private var position = Tile.zero
 	def move(direction: Vector2): Unit ={
 		position = Tile.fromVector(direction.add(position))
-		cam.translate(direction.scl(Tile.width, Tile.height))
+		cam.translate(Tile.toPixels(direction))
 	}
+	def tileToScreenPixels(tile:Tile) :Vector2 = Tile.toPixels(tile).sub(cam.position.x, cam.position.y)
 
 	def mouseScreenPos():Vector3 = cam.unproject(new Vector3(Gdx.input.getX, Gdx.input.getY,0)).sub(
-		new Vector3(position.scl(Tile.width, Tile.height), 0))
+		new Vector3(Tile.toPixels(position), 0))
+
 }
 
 object Cam {

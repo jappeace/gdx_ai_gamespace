@@ -23,8 +23,7 @@ case class Tile(left:Int, top:Int){
 		}
 		true
 	}
-
-
+	def -(rhs:Tile):Tile = Tile(left-rhs.left, top-rhs.top)
 }
 object Tile{
 	val width = 32
@@ -33,4 +32,5 @@ object Tile{
 
 	def fromVector(vector2: Vector2):Tile = Tile(vector2.x.toInt, vector2.y.toInt)
 	implicit def toVector(tile: Tile):Vector2 = new Vector2(tile.left, tile.top)
+	def toPixels(vector: Vector2):Vector2 = vector.scl(Tile.width, Tile.height)
 }

@@ -5,7 +5,6 @@ import com.badlogic.gdx.math.Vector2
 
 import nl.jappieklooster.gdx.mapstare.{Updateable, IntervalledUpdatable, Cam}
 import nl.jappieklooster.gdx.mapstare.model.Direction._
-import nl.jappieklooster.gdx.mapstare.model.Direction
 
 class CamController(implicit cam:Cam) extends IntervalledUpdatable with InputAdapter{
 	setFrametime(0.06f)

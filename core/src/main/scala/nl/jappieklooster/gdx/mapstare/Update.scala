@@ -7,7 +7,7 @@ trait IntervalledUpdatable extends Updateable{
 	private var frametime = 0.2f
 	protected def setFrametime(to:Float) = frametime = to
 	private var counter = 0f
-	override final def update(timeSinceLast:Float):Unit = {
+	override def update(timeSinceLast:Float):Unit = {
 		counter += timeSinceLast
 		if(counter > frametime){
 			counter -= frametime
