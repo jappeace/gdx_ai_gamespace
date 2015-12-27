@@ -1,5 +1,6 @@
 package nl.jappieklooster.gdx.mapstare
 
+import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.scenes.scene2d.{InputEvent, Stage}
@@ -9,7 +10,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.{InputMultiplexer, Input, ApplicationAdapter, Gdx}
 import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, BitmapFont}
-import nl.jappieklooster.gdx.mapstare.input.{OnClick, CamController}
+import nl.jappieklooster.gdx.mapstare.input.{InputAdapter, OnClick, CamController}
 import nl.jappieklooster.gdx.mapstare.model._
 import nl.jappieklooster.gdx.mapstare.view.Animation
 
@@ -28,6 +29,7 @@ class Main() extends ApplicationAdapter {
 	lazy val skin = new Skin(Gdx.files.internal("uiskin.json"))
 	lazy val container = new Table(skin)
 	var mouseAnimation:Option[Animation] = None
+	var animations:Seq[Animation] = Nil
 	override def create() = {
 		font.setColor(Color.BLACK)
 		val button = new TextButton("Click me", skin, "default")
@@ -39,11 +41,11 @@ class Main() extends ApplicationAdapter {
 			}
 		))
 		button.addListener(OnClick(() => {
-				println("clicked??")
 				dialog.show(stage)
 			}
 		))
-		Gdx.input.setInputProcessor(new InputMultiplexer(controller, stage))
+		val plexer = new InputMultiplexer(controller, stage)
+		Gdx.input.setInputProcessor(plexer)
 
 		val scrolltable = new Table(skin)
 		val scrollpane = new ScrollPane(scrolltable, skin, "default")
@@ -53,11 +55,27 @@ class Main() extends ApplicationAdapter {
 		container.add(button)
 		val label = new TextButton("Swordman", skin, "default")
 		label.addListener(OnClick(()=> {
-				println("clicke blah")
+				def screenToTile(screen:Vector3) =
+					Tile.fromPixels(screen) + cam.getPosition - Tile(3,4)
+				plexer.addProcessor(new InputAdapter {
+					override def touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
+						button match{
+							case Buttons.LEFT =>
+								println(s"left ($screenX, $screenY)")
+								animations = animations :+ swordmanFactory(Swordman(screenToTile(new Vector3(screenX, Gdx.graphics.getHeight - screenY, 0))))
+								true
+							case Buttons.RIGHT =>
+								mouseAnimation = None
+								plexer.removeProcessor(this)
+								true
+							case _ => false
+						}
+					}
+				})
 				mouseAnimation = Some(
 					swordmanFactory(new Entity {
 						override def getPosition:Tile = {
-							Tile.fromPixels(cam.mouseScreenPos()) + cam.getPosition - Tile(3,4)
+							screenToTile(cam.mouseScreenPos())
 						}
 					}
 					)
@@ -89,6 +107,7 @@ class Main() extends ApplicationAdapter {
 		for(animation <- mouseAnimation){
 			animation.update(timeSinceLast)
 		}
+		animations.foreach(_.update(timeSinceLast))
 	}
 	override def render() = {
 		update(Gdx.graphics.getDeltaTime)
@@ -104,6 +123,7 @@ class Main() extends ApplicationAdapter {
 		for(animation <- mouseAnimation){
 			animation.render(batch)
 		}
+		animations.foreach(_.render(batch))
 		batch.end()
 		stage.act(Gdx.graphics.getDeltaTime)
 		stage.draw()

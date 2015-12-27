@@ -21,5 +21,6 @@ object OnClick{
 	 * @return
 	 */
 	def apply(function:()=>Unit):OnClick=apply((a, b,c)=>function())
+	def apply(function:(InputEvent)=>Unit):OnClick=apply((a, b,c)=>function(a))
 	def apply(function: (InputEvent, Float,Float) => Unit)=new OnClick(function)
 }
