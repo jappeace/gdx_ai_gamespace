@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.{InputMultiplexer, Input, ApplicationAdapter, Gdx}
 import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, BitmapFont}
-import nl.jappieklooster.gdx.mapstare.input.{PlacementController, InputAdapter, OnClick, CamController}
+import nl.jappieklooster.gdx.mapstare.input.{PlacementClick, InputAdapter, OnClick, CamController}
 import nl.jappieklooster.gdx.mapstare.model._
 import nl.jappieklooster.gdx.mapstare.view.Animation
 
@@ -55,7 +55,7 @@ class Main() extends ApplicationAdapter {
 		container.add(button)
 		val label = new TextButton("Swordman", skin, "default")
 		label.addListener(
-			new PlacementController(plexer,
+			new PlacementClick(plexer,
 				factory = swordmanFactory,
 				placeCallback = a=> animations = animations :+ a,
 				followCallback = a=> mouseAnimation=a
