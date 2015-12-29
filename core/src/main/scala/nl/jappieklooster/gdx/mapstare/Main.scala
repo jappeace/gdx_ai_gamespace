@@ -24,7 +24,7 @@ class Main() extends ApplicationAdapter {
 	lazy val cam = Cam.cam
 	lazy val stage = new Stage(new ScreenViewport(), batch)
 	lazy val swordmanFactory = Animation.create(0.2f, 4, 227, 320, "swordman.png") _
-	lazy val controller = new CamController()
+	lazy val camMoveController = new CamController()
 
 	lazy val skin = new Skin(Gdx.files.internal("uiskin.json"))
 	lazy val container = new Table(skin)
@@ -45,7 +45,7 @@ class Main() extends ApplicationAdapter {
 				dialog.show(stage)
 			}
 		))
-		val plexer = new InputMultiplexer(controller, stage, selectionController)
+		implicit val plexer = new InputMultiplexer(camMoveController, stage, selectionController)
 		Gdx.input.setInputProcessor(plexer)
 
 		val scrolltable = new Table(skin)
@@ -56,7 +56,7 @@ class Main() extends ApplicationAdapter {
 		container.add(button)
 		val label = new TextButton("Swordman", skin, "default")
 		label.addListener(
-			new PlacementClick(plexer,
+			new PlacementClick(
 				factory = swordmanFactory,
 				placeCallback = a=> animations = animations :+ a,
 				followCallback = a=> mouseAnimation=a
@@ -82,7 +82,7 @@ class Main() extends ApplicationAdapter {
 
 	var x = 0
 	def update(timeSinceLast:Float): Unit ={
-		controller.update(timeSinceLast)
+		camMoveController.update(timeSinceLast)
 		cam.cam.update()
 		for(animation <- mouseAnimation){
 			animation.update(timeSinceLast)

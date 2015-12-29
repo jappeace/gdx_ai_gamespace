@@ -10,7 +10,7 @@ import nl.jappieklooster.gdx.mapstare.view.Animation
 import nl.jappieklooster.gdx.mapstare.Cam
 
 
-class PlacementClick(plexer:InputMultiplexer, factory:(Entity)=>Animation, placeCallback:(Animation)=>Unit, followCallback:(Option[Animation])=>Unit)(implicit cam:Cam) extends ClickListener{
+class PlacementClick(factory:(Entity)=>Animation, placeCallback:(Animation)=>Unit, followCallback:(Option[Animation])=>Unit)(implicit cam:Cam, plexer:InputMultiplexer) extends ClickListener{
 	override def clicked(event:InputEvent, x:Float, y:Float):Unit = {
 		click()
 	}

@@ -26,6 +26,8 @@ case class Tile(left:Int, top:Int){
 	def -(rhs:Tile):Tile = Tile(left-rhs.left, top-rhs.top)
 	def +(rhs:Tile):Tile = Tile(left+rhs.left, top+rhs.top)
 	lazy val neg = Tile(-left,-top)
+
+	lazy val pixels:Vector2 = Tile.toPixels(this)
 }
 object Tile{
 	val width = 32
