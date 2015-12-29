@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.{InputMultiplexer, Input, ApplicationAdapter, Gdx}
 import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, BitmapFont}
-import nl.jappieklooster.gdx.mapstare.input.{PlacementClick, InputAdapter, OnClick, CamController}
+import nl.jappieklooster.gdx.mapstare.input._
 import nl.jappieklooster.gdx.mapstare.model._
 import nl.jappieklooster.gdx.mapstare.view.Animation
 
@@ -30,6 +30,7 @@ class Main() extends ApplicationAdapter {
 	lazy val container = new Table(skin)
 	var mouseAnimation:Option[Animation] = None
 	var animations:Seq[Animation] = Nil
+	lazy val selectionController = new SelectionController
 	override def create() = {
 		font.setColor(Color.BLACK)
 		val button = new TextButton("Click me", skin, "default")
@@ -44,7 +45,7 @@ class Main() extends ApplicationAdapter {
 				dialog.show(stage)
 			}
 		))
-		val plexer = new InputMultiplexer(controller, stage)
+		val plexer = new InputMultiplexer(controller, stage, selectionController)
 		Gdx.input.setInputProcessor(plexer)
 
 		val scrolltable = new Table(skin)
@@ -104,6 +105,7 @@ class Main() extends ApplicationAdapter {
 		}
 		animations.foreach(_.render(batch))
 		batch.end()
+		selectionController.render(batch)
 		stage.act(Gdx.graphics.getDeltaTime)
 		stage.draw()
 	}

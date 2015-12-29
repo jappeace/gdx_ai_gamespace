@@ -27,7 +27,14 @@ class Cam {
 	def mouseScreenPos():Vector3 = unproject(
 		new Vector3(Gdx.input.getX, Gdx.input.getY,0)
 	)
+	def mouseScreenPos2():Vector2 = unproject(
+		new Vector2(Gdx.input.getX, Gdx.input.getY)
+	)
 
+	def unproject(vector2: Vector2):Vector2 = {
+		val v3 = unproject(new Vector3(vector2, 0))
+		new Vector2(v3.x, v3.y)
+	}
 	private def unproject(vector: Vector3) = cam.unproject(
 		vector.sub(
 			new Vector3(

@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.{SpriteBatch, Sprite}
 import nl.jappieklooster.gdx.mapstare.{Cam, IntervalledUpdatable}
 import nl.jappieklooster.gdx.mapstare.model.Entity
 
-class Animation(frametime:Float, sprites:Seq[Sprite], entity: Entity, cam:Cam) extends IntervalledUpdatable{
+class Animation(frametime:Float, sprites:Seq[Sprite], entity: Entity, cam:Cam) extends IntervalledUpdatable with Renderable{
 	setFrametime(frametime)
 	var currentframe = 0
 	var position:Vector2 = Vector2.Zero.cpy()
