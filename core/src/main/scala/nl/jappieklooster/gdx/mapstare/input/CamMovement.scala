@@ -3,10 +3,11 @@ package nl.jappieklooster.gdx.mapstare.input
 import com.badlogic.gdx.Input._
 import com.badlogic.gdx.math.Vector2
 
-import nl.jappieklooster.gdx.mapstare.{Updateable, IntervalledUpdatable, Cam}
+import nl.jappieklooster.gdx.mapstare.Cam
+import nl.jappieklooster.gdx.mapstare.controller.IntervalledUpdatable
 import nl.jappieklooster.gdx.mapstare.model.Direction._
 
-class CamController(implicit cam:Cam) extends IntervalledUpdatable with InputAdapter{
+class CamMovement(implicit cam:Cam) extends IntervalledUpdatable with InputAdapter{
 	setFrametime(0.06f)
 	var movement = Vector2.Zero.cpy
 	override def keyDown(keycode:Int):Boolean = keycode match {

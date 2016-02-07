@@ -10,9 +10,11 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.{InputMultiplexer, Input, ApplicationAdapter, Gdx}
 import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, BitmapFont}
+import nl.jappieklooster.gdx.mapstare.controller.Updater
 import nl.jappieklooster.gdx.mapstare.input._
 import nl.jappieklooster.gdx.mapstare.model._
 import nl.jappieklooster.gdx.mapstare.view.Animation
+import nl.jappieklooster.gdx.mapstare.controller._
 
 import com.badlogic.gdx.math._
 
@@ -24,13 +26,15 @@ class Main() extends ApplicationAdapter {
 	lazy val cam = Cam.cam
 	lazy val stage = new Stage(new ScreenViewport(), batch)
 	lazy val swordmanFactory = Animation.create(0.2f, 4, 227, 320, "swordman.png") _
-	lazy val camMoveController = new CamController()
+	lazy val camMoveController = new CamMovement()
 
 	lazy val skin = new Skin(Gdx.files.internal("uiskin.json"))
 	lazy val container = new Table(skin)
 	var mouseAnimation:Option[Animation] = None
 	var animations:Seq[Animation] = Nil
-	lazy val selectionController = new SelectionController
+	lazy val selectionController = new SelectionBox(
+		(one:Vector2, two:Vector2)=>updater.targets = updater.targets :+ Updateable.functionToUpdatable((float:Float)=>true) )
+	val updater = new Updater()
 	override def create() = {
 		font.setColor(Color.BLACK)
 		val button = new TextButton("Click me", skin, "default")
