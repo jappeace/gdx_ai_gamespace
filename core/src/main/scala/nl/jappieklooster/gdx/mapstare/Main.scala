@@ -11,6 +11,7 @@ import com.badlogic.gdx.{InputMultiplexer, Input, ApplicationAdapter, Gdx}
 import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, BitmapFont}
 import nl.jappieklooster.gdx.mapstare.controller.Updater
+import nl.jappieklooster.gdx.mapstare.input.gui.OnClick
 import nl.jappieklooster.gdx.mapstare.input._
 import nl.jappieklooster.gdx.mapstare.model._
 import nl.jappieklooster.gdx.mapstare.view.Animation

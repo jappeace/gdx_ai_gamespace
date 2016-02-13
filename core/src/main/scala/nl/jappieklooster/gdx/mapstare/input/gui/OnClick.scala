@@ -1,4 +1,4 @@
-package nl.jappieklooster.gdx.mapstare.input
+package nl.jappieklooster.gdx.mapstare.input.gui
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener

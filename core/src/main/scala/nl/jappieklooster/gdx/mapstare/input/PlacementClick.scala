@@ -4,13 +4,13 @@ import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.{Gdx, InputMultiplexer}
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import nl.jappieklooster.gdx.mapstare.model.{Entity, Swordman, Tile}
+import nl.jappieklooster.gdx.mapstare.model.{Individual, Entity, Swordman, Tile}
 import com.badlogic.gdx.math._
 import nl.jappieklooster.gdx.mapstare.view.Animation
 import nl.jappieklooster.gdx.mapstare.Cam
 
 
-class PlacementClick(factory:(Entity)=>Animation, placeCallback:(Animation)=>Unit, followCallback:(Option[Animation])=>Unit)(implicit cam:Cam, plexer:InputMultiplexer) extends ClickListener{
+class PlacementClick(factory:(Individual)=>Animation, placeCallback:(Animation)=>Unit, followCallback:(Option[Animation])=>Unit)(implicit cam:Cam, plexer:InputMultiplexer) extends ClickListener{
 	override def clicked(event:InputEvent, x:Float, y:Float):Unit = {
 		click()
 	}
@@ -23,7 +23,7 @@ class PlacementClick(factory:(Entity)=>Animation, placeCallback:(Animation)=>Uni
 				button match{
 					case Buttons.LEFT =>
 						placeCallback(factory(
-							Swordman(
+							Individual(
 								screenToTile(
 									new Vector3(
 										screenX,
@@ -43,11 +43,13 @@ class PlacementClick(factory:(Entity)=>Animation, placeCallback:(Animation)=>Uni
 			}
 		})
 		followCallback(Some(
-			factory(new Entity {
-				override def getPosition:Tile = {
-					screenToTile(cam.mouseScreenPos())
-				}
-			}
+			factory(
+				new Individual(
+					new Vector2(
+						cam.mouseScreenPos().x,
+						cam.mouseScreenPos().z
+					)
+				)
 			)
 		))
 	}

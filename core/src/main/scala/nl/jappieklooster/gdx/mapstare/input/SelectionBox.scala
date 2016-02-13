@@ -7,15 +7,22 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math._
 import nl.jappieklooster.gdx.mapstare.controller.Updater
 import nl.jappieklooster.gdx.mapstare.input.SelectionBox.SelectionCallback
-import nl.jappieklooster.gdx.mapstare.model.{World, Tile}
+import nl.jappieklooster.gdx.mapstare.model.{Individual, World, Tile}
 import nl.jappieklooster.gdx.mapstare.view.Renderable
 import nl.jappieklooster.gdx.mapstare.Cam
 
 object SelectionBox{
 	type SelectionCallback = (Vector2, Vector2)=>Unit
-	def markUnitsAsSelected(updater:Updater,world:World)(one:Vector2, two:Vector2):Unit = {
-		// TODO: filter units based on selection coordinates, Maybe using Rectangle??
-		// val units = world.units.filter(_.position.)
+	def toRectangle(one:Vector2, two:Vector2):Rectangle = {
+		val smallX = if(one.x<two.x)one.x else two.x
+		val smallY = if(one.y<two.y)one.y else two.y
+		val bigX = if(one.x<two.x)one.x else two.x
+		val bigY = if(one.y<two.y)one.y else two.y
+		new Rectangle(smallX, smallY, bigX - smallX, bigY - smallY)
+	}
+	def markUnitsAsSelected(world:World)(one:Vector2, two:Vector2):Seq[Individual]= {
+		val rectangle = toRectangle(one,two)
+		world.units.filter(unit => rectangle.contains(unit.position))
 	}
 }
 class SelectionBox(callback:SelectionCallback)(implicit cam:Cam) extends InputAdapter with Renderable{
