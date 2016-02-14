@@ -1,7 +1,12 @@
-package nl.jappieklooster.gdx.mapstare.model
+package nl.jappieklooster.gdx.mapstare.model.math
 
 import com.badlogic.gdx.math._
 
+/**
+  * A tile in the world, buildings can be alligned to this for example
+  * @param left
+  * @param top
+  */
 case class Tile(left:Int, top:Int){
 	lazy val topLeftPixels = new Vector2(left * Tile.width, top * Tile.height)
 	lazy val bottomRightPixels = new Vector2((left + 1) * Tile.width, (top + 1) * Tile.height)
@@ -36,6 +41,7 @@ object Tile{
 
 	def fromVector(vector2: Vector2):Tile = Tile(vector2.x.toInt, vector2.y.toInt)
 	def fromPixels(vector: Vector3):Tile = Tile((vector.x/width).toInt, (vector.y/height).toInt)
+	def fromPixels(vector: Point):Tile = Tile((vector.x/width).toInt, (vector.y/height).toInt)
 	implicit def toVector(tile: Tile):Vector2 = new Vector2(tile.left, tile.top)
 	def toPixels(vector: Vector2):Vector2 = vector.scl(Tile.width, Tile.height)
 }

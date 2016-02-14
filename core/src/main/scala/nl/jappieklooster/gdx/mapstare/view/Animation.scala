@@ -6,19 +6,20 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, Sprite}
 import nl.jappieklooster.gdx.mapstare.Cam
 import nl.jappieklooster.gdx.mapstare.controller.IntervalledUpdatable
-import nl.jappieklooster.gdx.mapstare.model.Entity
+import nl.jappieklooster.gdx.mapstare.model.math.Tile
+import nl.jappieklooster.gdx.mapstare.model.{GameTick, Positionable, Individual, Entity}
 
-class Animation(frametime:Float, sprites:Seq[Sprite], entity: Entity, cam:Cam) extends IntervalledUpdatable with Renderable{
+class Animation(frametime:Float, sprites:Seq[Sprite], entity: Positionable, cam:Cam) extends IntervalledUpdatable with Renderable{
 	setFrametime(frametime)
 	var currentframe = 0
 	var position:Vector2 = Vector2.Zero.cpy()
 	val size = new Vector2(sprites.head.getWidth, sprites.head.getHeight)
-	override def update(timeSinceLast:Float) = {
-		position = cam.tileToScreenPixels(entity.position)
+	override def update(timeSinceLast:GameTick) = {
+		position = cam.tileToScreenPixels(Tile.fromPixels(entity.position))
 		super.update(timeSinceLast)
 	}
 	var change = 1
-	override def intervalledUpdate(timeSinceLast:Float):Boolean = {
+	override def intervalledUpdate(timeSinceLast:GameTick):Boolean = {
 		if (currentframe >= (sprites.length-2)){
 			change = -1
 		}
@@ -36,7 +37,7 @@ class Animation(frametime:Float, sprites:Seq[Sprite], entity: Entity, cam:Cam) e
 }
 
 object Animation{
-	def create(frametime:Float, frameCount:Int, frameWidth:Int, frameHeight:Int, texture:String)(entity: Entity)(implicit cam:Cam) = {
+	def create(frametime:Float, frameCount:Int, frameWidth:Int, frameHeight:Int, texture:String)(entity: Positionable)(implicit cam:Cam) = {
 		val spritesheet = new Texture(Gdx.files.internal(texture))
 		new Animation(
 			frametime,

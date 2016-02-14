@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2
 import nl.jappieklooster.gdx.mapstare.Cam
 import nl.jappieklooster.gdx.mapstare.controller.IntervalledUpdatable
 import nl.jappieklooster.gdx.mapstare.model.Direction._
+import nl.jappieklooster.gdx.mapstare.model.GameTick
 
 class CamMovement(implicit cam:Cam) extends IntervalledUpdatable with InputAdapter{
 	setFrametime(0.06f)
@@ -24,8 +25,9 @@ class CamMovement(implicit cam:Cam) extends IntervalledUpdatable with InputAdapt
 		case Keys.S | Keys.DOWN => movement.sub(Down); true
 		case _ => false
 	}
-	override def intervalledUpdate(timeSinceLast:Float): Unit ={
+	override def intervalledUpdate(timeSinceLast:GameTick): Boolean={
 		cam.move(movement)
 		movement = Vector2.Zero.cpy()
+		true
 	}
 }

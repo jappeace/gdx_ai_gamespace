@@ -4,7 +4,8 @@ import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.{Gdx, InputMultiplexer}
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import nl.jappieklooster.gdx.mapstare.model.{Individual, Entity, Swordman, Tile}
+import nl.jappieklooster.gdx.mapstare.model.math.Tile
+import nl.jappieklooster.gdx.mapstare.model.{Individual, Entity}
 import com.badlogic.gdx.math._
 import nl.jappieklooster.gdx.mapstare.view.Animation
 import nl.jappieklooster.gdx.mapstare.Cam
@@ -30,7 +31,7 @@ class PlacementClick(factory:(Individual)=>Animation, placeCallback:(Animation)=
 										Gdx.graphics.getHeight - screenY,
 										0
 									)
-								)
+								).topLeftPixels
 							)
 						))
 						true

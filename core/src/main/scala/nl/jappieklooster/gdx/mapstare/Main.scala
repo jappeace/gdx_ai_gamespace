@@ -34,7 +34,7 @@ class Main() extends ApplicationAdapter {
 	var mouseAnimation:Option[Animation] = None
 	var animations:Seq[Animation] = Nil
 	lazy val selectionController = new SelectionBox(
-		(one:Vector2, two:Vector2)=>updater.targets = updater.targets :+ Updateable.functionToUpdatable((float:Float)=>true) )
+		(one:Vector2, two:Vector2)=>updater.targets = updater.targets :+ Updateable.functionToUpdatable((float:GameTick)=>true) )
 	val updater = new Updater()
 	override def create() = {
 		font.setColor(Color.BLACK)
@@ -86,7 +86,7 @@ class Main() extends ApplicationAdapter {
 	}
 
 	var x = 0
-	def update(timeSinceLast:Float): Unit ={
+	def update(timeSinceLast:GameTick): Unit ={
 		camMoveController.update(timeSinceLast)
 		cam.cam.update()
 		for(animation <- mouseAnimation){
@@ -95,7 +95,7 @@ class Main() extends ApplicationAdapter {
 		animations.foreach(_.update(timeSinceLast))
 	}
 	override def render() = {
-		update(Gdx.graphics.getDeltaTime)
+		update(GameTick(Gdx.graphics.getDeltaTime))
 
 		val pos = cam.mouseScreenPos()
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)

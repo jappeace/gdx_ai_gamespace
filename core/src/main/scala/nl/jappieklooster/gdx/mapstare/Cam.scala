@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import nl.jappieklooster.gdx.mapstare.model._
 import Direction._
 import com.badlogic.gdx.math._
+import nl.jappieklooster.gdx.mapstare.model.math.Tile
 
 /**
  * Tha camera
@@ -15,7 +16,7 @@ class Cam {
 	private var positionChange = Tile.zero
 	toOrtho(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
 	def getPosition = position
-	def move(direction: Vector2): Individual ={
+	def move(direction: Vector2): Unit ={
 		positionChange = Tile.fromVector(direction.add(positionChange))
 		position += positionChange
 		cam.translate(Tile.toPixels(direction))

@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math._
 import nl.jappieklooster.gdx.mapstare.controller.Updater
 import nl.jappieklooster.gdx.mapstare.input.SelectionBox.SelectionCallback
-import nl.jappieklooster.gdx.mapstare.model.{Individual, World, Tile}
+import nl.jappieklooster.gdx.mapstare.model.{Individual, World}
 import nl.jappieklooster.gdx.mapstare.view.Renderable
 import nl.jappieklooster.gdx.mapstare.Cam
 
@@ -20,9 +20,11 @@ object SelectionBox{
 		val bigY = if(one.y<two.y)one.y else two.y
 		new Rectangle(smallX, smallY, bigX - smallX, bigY - smallY)
 	}
-	def markUnitsAsSelected(world:World)(one:Vector2, two:Vector2):Seq[Individual]= {
+	def markUnitsAsSelected(world:World)(one:Vector2, two:Vector2):Unit= {
 		val rectangle = toRectangle(one,two)
-		world.units.filter(unit => rectangle.contains(unit.position))
+		world.units = world.units.map(unit => if(rectangle.contains(unit.position)){
+			unit.copy(selected = true)
+		}else unit)
 	}
 }
 class SelectionBox(callback:SelectionCallback)(implicit cam:Cam) extends InputAdapter with Renderable{
