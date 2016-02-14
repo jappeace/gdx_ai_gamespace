@@ -1,7 +1,7 @@
 package nl.jappieklooster.gdx.mapstare.model
 
 import com.badlogic.gdx.math._
-import nl.jappieklooster.gdx.mapstare.controller.IndividualController
+import nl.jappieklooster.gdx.mapstare.controller.{Move, IndividualController}
 import nl.jappieklooster.gdx.mapstare.model.math._
 
 sealed trait Positionable{
@@ -24,7 +24,7 @@ case class Entity(tile:Tile) extends Positionable{
 case class Individual(
 		location:Point,
 		speed:Point = Point.zero,
-		controller:Individual.Controller = IndividualController.move,
+		controller:Individual.Controller = Move,
 		selected:Boolean = false
 ) extends Positionable{
 	override def position = location

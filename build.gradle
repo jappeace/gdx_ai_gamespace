@@ -37,6 +37,7 @@ project(":desktop") {
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+        compile "org.slf4j:slf4j-simple:1.7.16"
     }
 }
 
@@ -48,6 +49,8 @@ project(":core") {
 		compile "org.scala-lang:scala-library-all:2.11.7"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+        compile "org.slf4j:slf4j-api:1.7.16"
+
     }
 }
 

@@ -11,4 +11,5 @@ object Direction extends Enumeration{
 		Right -> Vector2.X.cpy()
 	)
 	implicit def toVectorID(direction: Direction):Vector2 = map(direction).cpy()
+
 }

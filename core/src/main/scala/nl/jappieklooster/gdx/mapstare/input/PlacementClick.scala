@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import nl.jappieklooster.gdx.mapstare.model.math.Tile
 import nl.jappieklooster.gdx.mapstare.model.{Individual, Entity}
+import nl.jappieklooster.gdx.mapstare.model.math.Point
 import com.badlogic.gdx.math._
 import nl.jappieklooster.gdx.mapstare.view.Animation
 import nl.jappieklooster.gdx.mapstare.Cam
@@ -45,8 +46,8 @@ class PlacementClick(factory:(Individual)=>Animation, placeCallback:(Animation)=
 		})
 		followCallback(Some(
 			factory(
-				new Individual(
-					new Vector2(
+				Individual(
+					Point(
 						cam.mouseScreenPos().x,
 						cam.mouseScreenPos().z
 					)
