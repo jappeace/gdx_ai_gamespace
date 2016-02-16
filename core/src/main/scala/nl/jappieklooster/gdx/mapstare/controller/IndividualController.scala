@@ -1,21 +1,24 @@
 package nl.jappieklooster.gdx.mapstare.controller
 
-import nl.jappieklooster.gdx.mapstare.model.{GameTick, Individual}
+import nl.jappieklooster.gdx.mapstare.model.{IndividualController, GameTick, Individual}
 import nl.jappieklooster.gdx.mapstare.model.math._
 
-trait IndividualController extends Individual.Controller{}
-object Move extends IndividualController{
+/**
+  * The move controller lets the individual move according to its speed.
+  */
+case object Move extends IndividualController{
 	def apply(gameTick: GameTick,ind: Individual) = ind.copy(location=ind.location+ind.speed * gameTick.timeSinceLastFrame)
 }
 
 
 /**
-  *
+  * Move to an (error margined) location in gamespace, with acceleartion
+  * and deceleration.
   * @param targetLocation a circle to give an error margin
   * @param ind
   * @return
   */
-class MoveTo(targetLocation: Circle) extends IndividualController{
+case class MoveTo(targetLocation: Circle) extends IndividualController{
 	def apply(gameTick: GameTick, ind: Individual) = {
 		var result = ind
 		if(ind.speed.lengthSq < Individual.maxSpeedSq){
