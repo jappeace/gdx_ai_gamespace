@@ -14,13 +14,10 @@ import nl.jappieklooster.gdx.mapstare.model.{World, GameTick}
 import nl.jappieklooster.gdx.mapstare.view.Animation
 
 class BuildState(world: World, cam: Cam, stage: Stage) extends State{
-	lazy val batch = new SpriteBatch()
-	lazy val font = new BitmapFont()
 	lazy val swordmanFactory = Animation.create(0.2f, 4, 227, 320, "swordman.png") _
 	lazy val camMoveController = new CamMovement()
 
 	lazy val skin = new Skin(Gdx.files.internal("uiskin.json"))
-	lazy val container = new Table(skin)
 	var mouseAnimation:Option[Animation] = None
 	var animations:Seq[Animation] = Nil
 	lazy val selectionController = new SelectionBox(
@@ -37,7 +34,6 @@ class BuildState(world: World, cam: Cam, stage: Stage) extends State{
 		true
 	}
 	override def enter(stateMachine: StateMachine):Unit = {
-		font.setColor(Color.BLACK)
 		val button = new TextButton("Click me", skin, "default")
 		button.setWidth(200)
 		button.setHeight(50)
