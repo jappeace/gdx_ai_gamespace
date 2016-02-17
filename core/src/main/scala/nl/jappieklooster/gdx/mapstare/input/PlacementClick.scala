@@ -14,13 +14,9 @@ import nl.jappieklooster.gdx.mapstare.Cam
 
 class PlacementClick(placeCallback:(Individual)=>Unit)(implicit cam:Cam, plexer:InputMultiplexer) extends ClickListener{
 	override def clicked(event:InputEvent, x:Float, y:Float):Unit = {
-		click()
+		plexer.addProcessor(processor)
 	}
-
-	private def click() = {
-		def screenToTile(screen:Vector3) =
-			Tile.fromPixels(screen) + cam.getPosition - Tile(3,4)
-		plexer.addProcessor(new InputAdapter {
+	val processor = new InputAdapter {
 			override def touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
 				button match{
 					case Buttons.LEFT =>
@@ -42,6 +38,7 @@ class PlacementClick(placeCallback:(Individual)=>Unit)(implicit cam:Cam, plexer:
 					case _ => false
 				}
 			}
-		})
-	}
+		}
+
+	private def screenToTile(screen:Vector3) = Tile.fromPixels(screen) + cam.getPosition - Tile(3,4)
 }

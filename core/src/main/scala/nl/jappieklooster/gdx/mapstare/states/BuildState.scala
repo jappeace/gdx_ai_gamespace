@@ -26,8 +26,11 @@ class BuildState(world: World, stage: Stage)(implicit cam: Cam, inputMultiplexer
 		selectionController.render(null)
 		true
 	}
+	val clickThing = new PlacementClick(
+			placeCallback = a=> world.units = world.units :+ a
+		)
 	override def enter(stateMachine: StateMachine):Unit = {
-		val button = new TextButton("Click me", skin, "default")
+		val button = new TextButton("Start!", skin, "default")
 		button.setWidth(200)
 		button.setHeight(50)
 		val dialog = new Dialog("click message", skin)
@@ -36,7 +39,11 @@ class BuildState(world: World, stage: Stage)(implicit cam: Cam, inputMultiplexer
 		}
 		))
 		button.addListener(OnClick(() => {
-			dialog.show(stage)
+			if(world.units == Nil){
+				dialog.getTitleLabel.setText("No units made :s")
+				dialog.show(stage)
+			}
+			stateMachine.changeTo(new FightState(world, stage))
 		}
 		))
 
@@ -48,9 +55,7 @@ class BuildState(world: World, stage: Stage)(implicit cam: Cam, inputMultiplexer
 		container.add(button)
 		val label = new TextButton("Swordman", skin, "default")
 		label.addListener(
-			new PlacementClick(
-				placeCallback = a=> world.units = world.units :+ a
-			)
+			clickThing
 		)
 		scrolltable.add(label)
 		scrolltable.row()
@@ -72,5 +77,6 @@ class BuildState(world: World, stage: Stage)(implicit cam: Cam, inputMultiplexer
 	}
 	override def exit():Unit = {
 		stage.getRoot.clear()
+		inputMultiplexer.removeProcessor(clickThing.processor)
 	}
 }
