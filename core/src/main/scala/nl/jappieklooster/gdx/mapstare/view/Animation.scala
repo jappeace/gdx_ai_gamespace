@@ -12,7 +12,7 @@ import nl.jappieklooster.gdx.mapstare.model.{GameTick, Positionable, Individual,
 class Animation(frametime:Float, sprites:Seq[Sprite], cam:Cam) {
 	def render(individual: Individual, spriteBatch:SpriteBatch) = {
 		val position = cam.tileToScreenPixels(Tile.fromPixels(individual.position))
-		val currentFrame = individual.livingTime.toInt % (sprites.length-1)
+		val currentFrame = ((individual.livingTime % ((sprites.length-1)*frametime))/frametime).toInt
 		val sprite = sprites(currentFrame)
 		sprite.setPosition(position.x, position.y)
 		sprite.draw(spriteBatch)

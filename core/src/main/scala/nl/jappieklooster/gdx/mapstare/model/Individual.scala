@@ -1,7 +1,7 @@
 package nl.jappieklooster.gdx.mapstare.model
 
 import nl.jappieklooster.gdx.mapstare.model.math._
-import nl.jappieklooster.gdx.mapstare.controller.Move
+import nl.jappieklooster.gdx.mapstare.controller.{DoNothing, Move}
 
 // swordman, archers, ents...
 // called inidividual cause unit is occipied by scala
@@ -15,8 +15,7 @@ import nl.jappieklooster.gdx.mapstare.controller.Move
   */
 case class Individual(
 		location:Point,
-		speed:Point = Point.zero, // Move to Move controller??
-		controller:IndividualController = Move,
+		controller:IndividualController = DoNothing,
 		selected:Boolean = false,
 		livingTime:Float = 0 // in seconds, used for animations for example
 ) extends Positionable{

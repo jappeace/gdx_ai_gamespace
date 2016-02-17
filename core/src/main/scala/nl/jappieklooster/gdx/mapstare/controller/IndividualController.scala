@@ -4,10 +4,24 @@ import nl.jappieklooster.gdx.mapstare.model.{IndividualController, GameTick, Ind
 import nl.jappieklooster.gdx.mapstare.model.math._
 
 /**
+  * It doesn't even do anything (useful for initialization)
+  */
+case object DoNothing extends IndividualController{
+	def apply(gameTick: GameTick,ind: Individual) = ind
+}
+/**
   * The move controller lets the individual move according to its speed.
   */
-case object Move extends IndividualController{
-	def apply(gameTick: GameTick,ind: Individual) = ind.copy(location=ind.location+ind.speed * gameTick.timeSinceLastFrame)
+case class Move(speed:Point) extends IndividualController{
+	def apply(gameTick: GameTick,ind: Individual):Individual = {
+		if(speed == Point.zero){
+			return DoNothing(gameTick, ind)
+		}
+		ind.copy(location=ind.location+speed * gameTick.timeSinceLastFrame)
+	}
+}
+object Move{
+	val noMovement = Move(Point.zero)
 }
 
 
@@ -19,19 +33,20 @@ case object Move extends IndividualController{
   * @return
   */
 case class MoveTo(targetLocation: Circle) extends IndividualController{
+	private var movement = Move.noMovement
 	def apply(gameTick: GameTick, ind: Individual) = {
-		var result = ind
-		if(ind.speed.lengthSq < Individual.maxSpeedSq){
+		if(movement.speed.lengthSq < Individual.maxSpeedSq){
 			val distance = ind.position - targetLocation.position
 			val scaled = distance * Individual.acceleration
 			val change =
 			// check if should do slowing down
-				if(distance.lengthSq < ind.speed.lengthSq) -scaled else scaled
-			result = result.copy(speed = result.speed + change)
+				if(distance.lengthSq < movement.speed.lengthSq) -scaled else scaled
+			movement = movement.copy(speed = movement.speed + change)
 		}
-		result = Move(gameTick, result)
+		var result = movement(gameTick, ind)
 		if(!targetLocation.contains(result.position)){
-			result = result.copy(speed=Point.zero, controller = Move)
+			movement = Move.noMovement
+			result = result.copy(controller = DoNothing)
 		}
 		result
 	}
