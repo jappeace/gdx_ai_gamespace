@@ -13,8 +13,7 @@ import nl.jappieklooster.gdx.mapstare.input.{PlacementClick, SelectionBox, CamMo
 import nl.jappieklooster.gdx.mapstare.model.{World, GameTick}
 import nl.jappieklooster.gdx.mapstare.view.Animation
 
-class BuildState(world: World, cam: Cam, stage: Stage) extends State{
-	lazy val camMoveController = new CamMovement()
+class BuildState(world: World, stage: Stage)(implicit cam: Cam, inputMultiplexer: InputMultiplexer) extends State{
 
 	lazy val skin = new Skin(Gdx.files.internal("uiskin.json"))
 	var animations:Seq[Animation] = Nil
@@ -23,8 +22,8 @@ class BuildState(world: World, cam: Cam, stage: Stage) extends State{
 	val updater = new Updater()
 	var x = 0
 	def update(timeSinceLast:GameTick): Boolean={
-		camMoveController.update(timeSinceLast)
 		cam.cam.update()
+		selectionController.render(null)
 		true
 	}
 	override def enter(stateMachine: StateMachine):Unit = {
@@ -40,8 +39,6 @@ class BuildState(world: World, cam: Cam, stage: Stage) extends State{
 			dialog.show(stage)
 		}
 		))
-		implicit val plexer = new InputMultiplexer(camMoveController, stage, selectionController)
-		Gdx.input.setInputProcessor(plexer)
 
 		val scrolltable = new Table(skin)
 		val scrollpane = new ScrollPane(scrolltable, skin, "default")

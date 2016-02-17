@@ -31,6 +31,7 @@ class Main() extends ApplicationAdapter {
 	lazy val maprendeer = new OrthogonalTiledMapRenderer(new TmxMapLoader().load("map.tmx"))
 	lazy val cam = Cam.cam
 	lazy val stage = new Stage(new ScreenViewport(), batch)
+	lazy val camMoveController = new CamMovement()
 
 	lazy val animation = Animation.create(0.2f, 4, 227, 320, "swordman.png")(cam)
 	lazy val selectionController = new SelectionBox(
@@ -39,13 +40,16 @@ class Main() extends ApplicationAdapter {
 	val stateMachine = new StateMachine()
 	val world = new World(Nil,Nil)
 	override def create() = {
-		stateMachine.changeTo(new BuildState(world, cam, stage))
+		implicit val plexer = new InputMultiplexer(camMoveController, stage, selectionController)
+		stateMachine.changeTo(new BuildState(world, stage))
 		updater.targets = updater.targets :+ stateMachine :+ new WorldUpdater(world)
+		Gdx.input.setInputProcessor(plexer)
 	}
 
 	var x = 0
 	def update(timeSinceLast:GameTick): Unit ={
 		updater.update(timeSinceLast)
+		camMoveController.update(timeSinceLast)
 	}
 	override def render() = {
 		update(GameTick(Gdx.graphics.getDeltaTime))
