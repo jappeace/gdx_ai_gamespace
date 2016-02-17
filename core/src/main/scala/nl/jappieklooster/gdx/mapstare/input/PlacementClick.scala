@@ -12,7 +12,7 @@ import nl.jappieklooster.gdx.mapstare.view.Animation
 import nl.jappieklooster.gdx.mapstare.Cam
 
 
-class PlacementClick(factory:(Individual)=>Animation, placeCallback:(Animation)=>Unit, followCallback:(Option[Animation])=>Unit)(implicit cam:Cam, plexer:InputMultiplexer) extends ClickListener{
+class PlacementClick(placeCallback:(Individual)=>Unit)(implicit cam:Cam, plexer:InputMultiplexer) extends ClickListener{
 	override def clicked(event:InputEvent, x:Float, y:Float):Unit = {
 		click()
 	}
@@ -24,7 +24,7 @@ class PlacementClick(factory:(Individual)=>Animation, placeCallback:(Animation)=
 			override def touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
 				button match{
 					case Buttons.LEFT =>
-						placeCallback(factory(
+						placeCallback(
 							Individual(
 								screenToTile(
 									new Vector3(
@@ -34,25 +34,14 @@ class PlacementClick(factory:(Individual)=>Animation, placeCallback:(Animation)=
 									)
 								).topLeftPixels
 							)
-						))
+						)
 						true
 					case Buttons.RIGHT =>
-						followCallback(None)
 						plexer.removeProcessor(this)
 						true
 					case _ => false
 				}
 			}
 		})
-		followCallback(Some(
-			factory(
-				Individual(
-					Point(
-						cam.mouseScreenPos().x,
-						cam.mouseScreenPos().z
-					)
-				)
-			)
-		))
 	}
 }

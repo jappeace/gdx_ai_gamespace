@@ -17,7 +17,8 @@ case class Individual(
 		location:Point,
 		speed:Point = Point.zero, // Move to Move controller??
 		controller:IndividualController = Move,
-		selected:Boolean = false
+		selected:Boolean = false,
+		livingTime:Float = 0 // in seconds, used for animations for example
 ) extends Positionable{
 	override def position = location
 }

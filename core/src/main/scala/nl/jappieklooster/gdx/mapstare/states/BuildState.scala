@@ -14,11 +14,9 @@ import nl.jappieklooster.gdx.mapstare.model.{World, GameTick}
 import nl.jappieklooster.gdx.mapstare.view.Animation
 
 class BuildState(world: World, cam: Cam, stage: Stage) extends State{
-	lazy val swordmanFactory = Animation.create(0.2f, 4, 227, 320, "swordman.png") _
 	lazy val camMoveController = new CamMovement()
 
 	lazy val skin = new Skin(Gdx.files.internal("uiskin.json"))
-	var mouseAnimation:Option[Animation] = None
 	var animations:Seq[Animation] = Nil
 	lazy val selectionController = new SelectionBox(
 		(one:Vector2, two:Vector2)=>updater.targets = updater.targets :+ Updateable.functionToUpdatable((float:GameTick)=>true) )
@@ -27,10 +25,6 @@ class BuildState(world: World, cam: Cam, stage: Stage) extends State{
 	def update(timeSinceLast:GameTick): Boolean={
 		camMoveController.update(timeSinceLast)
 		cam.cam.update()
-		for(animation <- mouseAnimation){
-			animation.update(timeSinceLast)
-		}
-		animations.foreach(_.update(timeSinceLast))
 		true
 	}
 	override def enter(stateMachine: StateMachine):Unit = {
@@ -58,9 +52,7 @@ class BuildState(world: World, cam: Cam, stage: Stage) extends State{
 		val label = new TextButton("Swordman", skin, "default")
 		label.addListener(
 			new PlacementClick(
-				factory = swordmanFactory,
-				placeCallback = a=> animations = animations :+ a,
-				followCallback = a=> mouseAnimation=a
+				placeCallback = a=> world.units = world.units :+ a
 			)
 		)
 		scrolltable.add(label)
