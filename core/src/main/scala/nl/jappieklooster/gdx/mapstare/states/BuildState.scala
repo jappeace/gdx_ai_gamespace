@@ -26,6 +26,7 @@ class BuildState(world: World, stage: Stage)(implicit cam: Cam, inputMultiplexer
 		selectionController.render(null)
 		true
 	}
+	// TODO: make this scalable (also multiple types of units, snould acutally be doable with a list)
 	val clickThing = new PlacementClick(
 			placeCallback = a=> world.units = world.units :+ a
 		)
