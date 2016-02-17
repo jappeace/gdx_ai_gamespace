@@ -40,6 +40,7 @@ class Main() extends ApplicationAdapter {
 	val stateMachine = new StateMachine()
 	val world = new World(Nil,Nil)
 	override def create() = {
+		// TODO: replace the plexer with an own variant which uses an enum map??
 		implicit val plexer = new InputMultiplexer(camMoveController, stage, selectionController)
 		stateMachine.changeTo(new BuildState(world, stage))
 		updater.targets = updater.targets :+ stateMachine :+ new WorldUpdater(world)
