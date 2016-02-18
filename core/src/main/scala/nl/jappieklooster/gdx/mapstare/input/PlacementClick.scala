@@ -12,7 +12,7 @@ import nl.jappieklooster.gdx.mapstare.view.Animation
 import nl.jappieklooster.gdx.mapstare.Cam
 
 
-class PlacementClick(placeCallback:(Individual)=>Unit)(implicit cam:Cam, plexer:InputMultiplexer) extends ClickListener{
+class PlacementClick(placeCallback:(Individual)=>Unit, cam:Cam, plexer:InputMultiplexer) extends ClickListener{
 	override def clicked(event:InputEvent, x:Float, y:Float):Unit = {
 		plexer.addProcessor(processor)
 	}

@@ -12,8 +12,9 @@ import nl.jappieklooster.gdx.mapstare.input.gui.OnClick
 import nl.jappieklooster.gdx.mapstare.input.{PlacementClick, SelectionBox, CamMovement}
 import nl.jappieklooster.gdx.mapstare.model.{World, GameTick}
 import nl.jappieklooster.gdx.mapstare.view.Animation
+import nl.jappieklooster.gdx.mapstare.Game
 
-class BuildState(world: World, stage: Stage)(implicit cam: Cam, inputMultiplexer: InputMultiplexer) extends State{
+class BuildState(game:Game) extends GameState(game){
 
 	lazy val skin = new Skin(Gdx.files.internal("uiskin.json"))
 	var animations:Seq[Animation] = Nil
@@ -28,7 +29,9 @@ class BuildState(world: World, stage: Stage)(implicit cam: Cam, inputMultiplexer
 	}
 	// TODO: make this scalable (also multiple types of units, snould acutally be doable with a list)
 	val clickThing = new PlacementClick(
-			placeCallback = a=> world.units = world.units :+ a
+			placeCallback = a=> world.units = world.units :+ a,
+			cam,
+			inputMultiplexer
 		)
 	override def enter(stateMachine: StateMachine):Unit = {
 		val button = new TextButton("Start!", skin, "default")
@@ -44,7 +47,7 @@ class BuildState(world: World, stage: Stage)(implicit cam: Cam, inputMultiplexer
 				dialog.getTitleLabel.setText("No units made :s")
 				dialog.show(stage)
 			}
-			stateMachine.changeTo(new FightState(world, stage))
+			stateMachine.changeTo(new FightState(game))
 		}
 		))
 

@@ -20,7 +20,7 @@ import nl.jappieklooster.gdx.mapstare.controller._
 
 import com.badlogic.gdx.math._
 
-class Main() extends ApplicationAdapter {
+class Game() extends ApplicationAdapter {
 	lazy val batch = new SpriteBatch()
 
 	lazy val font = {
@@ -39,10 +39,10 @@ class Main() extends ApplicationAdapter {
 	val updater = new Updater()
 	val stateMachine = new StateMachine()
 	val world = new World(Nil,Nil)
+	lazy val plexer = new InputMultiplexer(camMoveController, stage, selectionController)
 	override def create() = {
 		// TODO: replace the plexer with an own variant which uses an enum map??
-		implicit val plexer = new InputMultiplexer(camMoveController, stage, selectionController)
-		stateMachine.changeTo(new BuildState(world, stage))
+		stateMachine.changeTo(new BuildState(this))
 		updater.targets = updater.targets :+ stateMachine :+ new WorldUpdater(world)
 		Gdx.input.setInputProcessor(plexer)
 	}
