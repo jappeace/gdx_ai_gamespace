@@ -51,6 +51,7 @@ class Game() extends ApplicationAdapter {
 	def update(timeSinceLast:GameTick): Unit ={
 		updater.update(timeSinceLast)
 		camMoveController.update(timeSinceLast)
+		cam.cam.update()
 	}
 	override def render() = {
 		update(GameTick(Gdx.graphics.getDeltaTime))

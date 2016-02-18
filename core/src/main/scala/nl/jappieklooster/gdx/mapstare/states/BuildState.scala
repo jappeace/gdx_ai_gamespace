@@ -23,7 +23,6 @@ class BuildState(game:Game) extends GameState(game){
 	val updater = new Updater()
 	var x = 0
 	def update(timeSinceLast:GameTick): Boolean={
-		cam.cam.update()
 		selectionController.render(null)
 		true
 	}
