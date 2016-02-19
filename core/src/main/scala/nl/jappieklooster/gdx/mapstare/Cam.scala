@@ -35,8 +35,9 @@ class Cam {
 
 	def screenToTile(screen:Vector3) = Tile.fromPixels(screen) + getPosition - Tile(3,4)
 	def screenPointToWorld(point:Point):Point = {
-		val tile = Tile.fromPixels(point) + getPosition - Tile(3,4)
-		tile.topLeftPixels
+		val tile = Tile.fromPixels(point) + position - Tile(3,4)
+		val result = cam.project(new Vector3(tile.topLeftPixels.x,tile.topLeftPixels.y,0))
+		Point(result.x,result.y)
 	}
 	def unproject(vector2: Point):Point= {
 		val v3 = unproject(new Vector3(vector2, 0))
