@@ -18,7 +18,9 @@ class FightState (game:Game) extends GameState(game){
 	  * @return should keep updating?
 	  */
 	override def update(tick: GameTick): Boolean = {
-		log.info("Fighting!")
 		true
+	}
+	override def enter(gameState: StateMachine): Unit ={
+		game.selectionController.callback = SelectionBox.markUnitsAsSelected(game.world)
 	}
 }

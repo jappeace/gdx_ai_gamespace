@@ -14,6 +14,7 @@ case class Point(x:Float, y:Float) {
 	def unary_- = negate
 
 	def scale(to:Float) = transform(x => x*to)
+	def scale(one:Float, two:Float) = Point(x*one, y*two)
 
 	/**
 	  * apply the same operation to all the elements of the vector and create

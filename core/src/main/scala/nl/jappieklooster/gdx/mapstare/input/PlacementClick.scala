@@ -40,5 +40,5 @@ class PlacementClick(placeCallback:(Individual)=>Unit, cam:Cam, plexer:InputMult
 			}
 		}
 
-	private def screenToTile(screen:Vector3) = Tile.fromPixels(screen) + cam.getPosition - Tile(3,4)
+	def screenToTile(screen:Vector3) = Tile.fromPixels(screen) + cam.getPosition - Tile(3,4)
 }

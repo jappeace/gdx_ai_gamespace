@@ -8,8 +8,8 @@ import com.badlogic.gdx.math._
   * @param top
   */
 case class Tile(left:Int, top:Int){
-	lazy val topLeftPixels = new Vector2(left * Tile.width, top * Tile.height)
-	lazy val bottomRightPixels = new Vector2((left + 1) * Tile.width, (top + 1) * Tile.height)
+	lazy val topLeftPixels = Tile.toPixels(Tile.toPoint(this))
+	lazy val bottomRightPixels = Tile.toPixels(Tile.toPoint(this)+Point.id)
 
 	def contains(pixels: Vector2): Boolean = {
 		val tl = topLeftPixels
@@ -31,17 +31,15 @@ case class Tile(left:Int, top:Int){
 	def -(rhs:Tile):Tile = Tile(left-rhs.left, top-rhs.top)
 	def +(rhs:Tile):Tile = Tile(left+rhs.left, top+rhs.top)
 	lazy val neg = Tile(-left,-top)
-
-	lazy val pixels:Vector2 = Tile.toPixels(this)
 }
 object Tile{
 	val width = 32
 	val height = 32
 	val zero = Tile(0,0)
 
-	def fromVector(vector2: Vector2):Tile = Tile(vector2.x.toInt, vector2.y.toInt)
+	def fromVector(vector2: Point):Tile = Tile(vector2.x.toInt, vector2.y.toInt)
 	def fromPixels(vector: Vector3):Tile = Tile((vector.x/width).toInt, (vector.y/height).toInt)
-	def fromPixels(vector: Point):Tile = Tile((vector.x/width).toInt, (vector.y/height).toInt)
-	implicit def toVector(tile: Tile):Vector2 = new Vector2(tile.left, tile.top)
-	def toPixels(vector: Vector2):Vector2 = vector.scl(Tile.width, Tile.height)
+	def fromPixels(point: Point):Tile = Tile((point.x/width).toInt, (point.y/height).toInt)
+	def toPoint(tile: Tile):Point = new Point(tile.left, tile.top)
+	def toPixels(point: Point):Point = point.scale(Tile.width, Tile.height)
 }

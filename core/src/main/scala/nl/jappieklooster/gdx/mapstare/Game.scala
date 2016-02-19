@@ -34,8 +34,7 @@ class Game() extends ApplicationAdapter {
 	lazy val camMoveController = new CamMovement()
 
 	lazy val animation = Animation.create(0.2f, 4, 227, 320, "swordman.png")(cam)
-	lazy val selectionController = new SelectionBox(
-		(one:Vector2, two:Vector2)=>updater.targets = updater.targets :+ Updateable.functionToUpdatable((float:GameTick)=>true) )
+	lazy val selectionController = new SelectionBox()
 	val updater = new Updater()
 	val stateMachine = new StateMachine()
 	val world = new World(Nil,Nil)

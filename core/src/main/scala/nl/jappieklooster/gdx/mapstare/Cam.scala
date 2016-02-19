@@ -3,6 +3,7 @@ package nl.jappieklooster.gdx.mapstare
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import nl.jappieklooster.gdx.mapstare.model._
+import nl.jappieklooster.gdx.mapstare.model.math._
 import Direction._
 import com.badlogic.gdx.math._
 import nl.jappieklooster.gdx.mapstare.model.math.Tile
@@ -16,13 +17,13 @@ class Cam {
 	private var positionChange = Tile.zero
 	toOrtho(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
 	def getPosition = position
-	def move(direction: Vector2): Unit ={
-		positionChange = Tile.fromVector(direction.add(positionChange))
+	def move(direction: Point): Unit ={
+		positionChange = Tile.fromVector(direction + Tile.toPoint(positionChange))
 		position += positionChange
-		cam.translate(Tile.toPixels(direction))
+		cam.translate(positionChange.topLeftPixels)
 	}
-	def tileToScreenPixels(tile:Tile) :Vector2 = {
-		Tile.toPixels(tile).sub(Tile.toPixels(position))
+	def tileToScreenPixels(tile:Tile) :Point = {
+		Tile.toPixels(Tile.toPoint(tile)) - position.topLeftPixels
 	}
 
 	def mouseScreenPos():Vector3 = unproject(
@@ -32,14 +33,19 @@ class Cam {
 		new Vector2(Gdx.input.getX, Gdx.input.getY)
 	)
 
-	def unproject(vector2: Vector2):Vector2 = {
+	def screenToTile(screen:Vector3) = Tile.fromPixels(screen) + getPosition - Tile(3,4)
+	def screenPointToWorld(point:Point):Point = {
+		val tile = Tile.fromPixels(point) + getPosition - Tile(3,4)
+		tile.topLeftPixels
+	}
+	def unproject(vector2: Point):Point= {
 		val v3 = unproject(new Vector3(vector2, 0))
-		new Vector2(v3.x, v3.y)
+		Point(v3.x, v3.y)
 	}
 	private def unproject(vector: Vector3) = cam.unproject(
 		vector.sub(
 			new Vector3(
-				Tile.toPixels(position).scl(1,-1),
+				Tile.toPixels(Tile.toPoint(position)).scale(1,-1),
 				0
 			)
 		)

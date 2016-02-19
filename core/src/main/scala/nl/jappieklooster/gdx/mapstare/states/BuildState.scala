@@ -11,6 +11,7 @@ import nl.jappieklooster.gdx.mapstare.controller.{Updateable, Updater}
 import nl.jappieklooster.gdx.mapstare.input.gui.OnClick
 import nl.jappieklooster.gdx.mapstare.input.{PlacementClick, SelectionBox, CamMovement}
 import nl.jappieklooster.gdx.mapstare.model.{World, GameTick}
+import nl.jappieklooster.gdx.mapstare.model.math._
 import nl.jappieklooster.gdx.mapstare.view.Animation
 import nl.jappieklooster.gdx.mapstare.Game
 
@@ -19,7 +20,7 @@ class BuildState(game:Game) extends GameState(game){
 	lazy val skin = new Skin(Gdx.files.internal("uiskin.json"))
 	var animations:Seq[Animation] = Nil
 	lazy val selectionController = new SelectionBox(
-		(one:Vector2, two:Vector2)=>updater.targets = updater.targets :+ Updateable.functionToUpdatable((float:GameTick)=>true) )
+		(one:Point, two:Point)=>updater.targets = updater.targets :+ Updateable.functionToUpdatable((float:GameTick)=>true) )
 	val updater = new Updater()
 	var x = 0
 	def update(timeSinceLast:GameTick): Boolean={

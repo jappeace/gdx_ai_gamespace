@@ -16,7 +16,7 @@ import nl.jappieklooster.gdx.mapstare.controller.{DoNothing, Move}
 case class Individual(
 		location:Point,
 		controller:IndividualController = DoNothing,
-		selected:Boolean = true,
+		selected:Boolean = false,
 		livingTime:Float = 0 // in seconds, used for animations for example
 ) extends Positionable{
 	override def position = location
