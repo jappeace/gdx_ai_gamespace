@@ -20,8 +20,8 @@ trait InputAdapter extends InputProcessor{
 trait MouseClickAdapter extends InputAdapter {
 	override def touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
 		button match {
-			case Buttons.LEFT => rightClick(screenX, screenY, pointer)
-			case Buttons.RIGHT => leftClick(screenX, screenY, pointer)
+			case Buttons.LEFT => leftClick(screenX, screenY, pointer)
+			case Buttons.RIGHT => rightClick(screenX, screenY, pointer)
 			case _ => false
 		}
 	}

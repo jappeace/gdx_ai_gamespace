@@ -19,6 +19,7 @@ class FightState (game:Game) extends GameState(game){
 	  * @return should keep updating?
 	  */
 	override def update(tick: GameTick): Boolean = {
+		log.info("FIGHTING@!")
 		true
 	}
 	val clickHandler = new MouseClickAdapter {

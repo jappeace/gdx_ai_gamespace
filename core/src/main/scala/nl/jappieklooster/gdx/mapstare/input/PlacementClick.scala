@@ -17,7 +17,7 @@ class PlacementClick(placeCallback:(Individual)=>Unit, cam:Cam, plexer:InputMult
 		plexer.addProcessor(processor)
 	}
 	val processor = new MouseClickAdapter {
-		override def rightClick(screenX:Int, screenY:Int, pointer:Int):Boolean = {
+		override def leftClick(screenX:Int, screenY:Int, pointer:Int):Boolean = {
 			placeCallback(
 				Individual(
 					screenToTile(
@@ -31,7 +31,7 @@ class PlacementClick(placeCallback:(Individual)=>Unit, cam:Cam, plexer:InputMult
 			)
 			true
 		}
-		override def leftClick(screenX:Int, screenY:Int, pointer:Int):Boolean = {
+		override def rightClick(screenX:Int, screenY:Int, pointer:Int):Boolean = {
 			plexer.removeProcessor(this)
 			true
 		}

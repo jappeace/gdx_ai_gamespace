@@ -2,6 +2,7 @@ package nl.jappieklooster.gdx.mapstare.controller
 
 import nl.jappieklooster.gdx.mapstare.model.{IndividualController, GameTick, Individual}
 import nl.jappieklooster.gdx.mapstare.model.math._
+import org.slf4j.LoggerFactory
 
 /**
   * It doesn't even do anything (useful for initialization)
@@ -28,12 +29,14 @@ object Move{
 /**
   * Move to an (error margined) location in gamespace, with acceleartion
   * and deceleration.
+ *
   * @param targetLocation a circle to give an error margin
   * @param ind
   * @return
   */
 case class MoveTo(targetLocation: Circle) extends IndividualController{
 	private var movement = Move.noMovement
+	private val log = LoggerFactory.getLogger(classOf[MoveTo])
 	def apply(gameTick: GameTick, ind: Individual) = {
 		if(movement.speed.lengthSq < Individual.maxSpeedSq){
 			val distance = ind.position - targetLocation.position
@@ -43,7 +46,9 @@ case class MoveTo(targetLocation: Circle) extends IndividualController{
 				if(distance.lengthSq < movement.speed.lengthSq) -scaled else scaled
 			movement = movement.copy(speed = movement.speed + change)
 		}
+		log.info(s"before movement $ind")
 		var result = movement(gameTick, ind)
+		log.info(s"after movement $result")
 		if(!targetLocation.contains(result.position)){
 			movement = Move.noMovement
 			result = result.copy(controller = DoNothing)
