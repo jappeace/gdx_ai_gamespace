@@ -19,7 +19,6 @@ class FightState (game:Game) extends GameState(game){
 	  * @return should keep updating?
 	  */
 	override def update(tick: GameTick): Boolean = {
-		log.info("FIGHTING@!")
 		true
 	}
 	val clickHandler = new MouseClickAdapter {
@@ -27,7 +26,11 @@ class FightState (game:Game) extends GameState(game){
 			true
 		}
 		override def rightClick(screenX:Int, screenY:Int, pointer:Int):Boolean = {
-			world.units = world.units.map(x=> if(x.selected){x.copy(controller = MoveTo(Circle(cam.screenPointToWorld(Point(screenX,screenY)), 0.1f)))}else{x})
+			world.units = world.units.map(x=> if(x.selected){
+				x.copy(
+					controller = MoveTo(Circle(cam.screenToTile(cam.unproject(Point(screenX,screenY))).topLeftPixels, 0.1f))
+				)
+			}else x)
 			true
 		}
 	}

@@ -8,7 +8,9 @@ import org.slf4j.LoggerFactory
   * It doesn't even do anything (useful for initialization)
   */
 case object DoNothing extends IndividualController{
-	def apply(gameTick: GameTick,ind: Individual) = ind
+	def apply(gameTick: GameTick,ind: Individual) = {
+		ind
+	}
 }
 /**
   * The move controller lets the individual move according to its speed.
@@ -37,20 +39,21 @@ object Move{
 case class MoveTo(targetLocation: Circle) extends IndividualController{
 	private var movement = Move.noMovement
 	private val log = LoggerFactory.getLogger(classOf[MoveTo])
+	log.info(s"moving to $targetLocation")
 	def apply(gameTick: GameTick, ind: Individual) = {
-		if(movement.speed.lengthSq < Individual.maxSpeedSq){
-			val distance = ind.position - targetLocation.position
-			val scaled = distance * Individual.acceleration
-			val change =
+		val distance = targetLocation.position - ind.position
+		import Individual._
+		if(movement.speed.lengthSq / acceleration < maxSpeedSq || distance.normal != movement.speed.normal){
+			val scaled = distance.normal * acceleration
+
+			val accSq = acceleration * acceleration
 			// check if should do slowing down
-				if(distance.lengthSq < movement.speed.lengthSq) -scaled else scaled
+			val change =
+				if(distance.lengthSq * accSq < movement.speed.lengthSq) -scaled else scaled
 			movement = movement.copy(speed = movement.speed + change)
 		}
-		log.info(s"before movement $ind")
 		var result = movement(gameTick, ind)
-		log.info(s"after movement $result")
-		if(!targetLocation.contains(result.position)){
-			movement = Move.noMovement
+		if(targetLocation.contains(result.position)){
 			result = result.copy(controller = DoNothing)
 		}
 		result

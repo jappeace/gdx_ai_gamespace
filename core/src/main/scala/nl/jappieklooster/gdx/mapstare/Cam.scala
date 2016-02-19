@@ -29,10 +29,8 @@ class Cam {
 	def mouseScreenPos():Vector3 = unproject(
 		new Vector3(Gdx.input.getX, Gdx.input.getY,0)
 	)
-	def mouseScreenPos2():Vector2 = unproject(
-		new Vector2(Gdx.input.getX, Gdx.input.getY)
-	)
 
+	def screenToTile(screen:Point) = Tile.fromPixels(screen) + getPosition - Tile(3,4)
 	def screenToTile(screen:Vector3) = Tile.fromPixels(screen) + getPosition - Tile(3,4)
 	def screenPointToWorld(point:Point):Point = {
 		val tile = Tile.fromPixels(point) + position - Tile(3,4)

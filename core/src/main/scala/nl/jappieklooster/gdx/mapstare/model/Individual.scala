@@ -23,7 +23,7 @@ case class Individual(
 }
 
 object Individual{
-	val maxSpeed = 2
+	val maxSpeed = 50
 	val maxSpeedSq = maxSpeed*maxSpeed
 	val acceleration = 0.3f
 }
