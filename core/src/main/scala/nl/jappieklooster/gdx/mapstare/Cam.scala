@@ -22,8 +22,8 @@ class Cam {
 		position += positionChange
 		cam.translate(positionChange.topLeftPixels)
 	}
-	def tileToScreenPixels(tile:Tile) :Point = {
-		Tile.toPixels(Tile.toPoint(tile)) - position.topLeftPixels
+	def pointToScreenPixels(tile:Point) :Point = {
+		Tile.toPixels(tile) - position.topLeftPixels
 	}
 
 	def mouseScreenPos():Vector3 = unproject(
