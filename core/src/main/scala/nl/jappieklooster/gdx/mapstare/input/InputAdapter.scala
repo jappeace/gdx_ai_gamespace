@@ -1,4 +1,6 @@
 package nl.jappieklooster.gdx.mapstare.input
+
+import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.InputProcessor;
 
 /**
@@ -13,4 +15,16 @@ trait InputAdapter extends InputProcessor{
 	override def scrolled(amount: Int): Boolean = false
 	override def touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = false
 	override def touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean = false
+}
+
+trait MouseClickAdapter extends InputAdapter {
+	override def touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
+		button match {
+			case Buttons.LEFT => rightClick(screenX, screenY, pointer)
+			case Buttons.RIGHT => leftClick(screenX, screenY, pointer)
+			case _ => false
+		}
+	}
+	def rightClick(screenX:Int, screenY:Int, pointer:Int):Boolean = false
+	def leftClick(screenX:Int, screenY:Int, pointer:Int):Boolean = false
 }

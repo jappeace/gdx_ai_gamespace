@@ -16,28 +16,25 @@ class PlacementClick(placeCallback:(Individual)=>Unit, cam:Cam, plexer:InputMult
 	override def clicked(event:InputEvent, x:Float, y:Float):Unit = {
 		plexer.addProcessor(processor)
 	}
-	val processor = new InputAdapter {
-			override def touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
-				button match{
-					case Buttons.LEFT =>
-						placeCallback(
-							Individual(
-								screenToTile(
-									new Vector3(
-										screenX,
-										Gdx.graphics.getHeight - screenY,
-										0
-									)
-								).topLeftPixels
-							)
+	val processor = new MouseClickAdapter {
+		override def rightClick(screenX:Int, screenY:Int, pointer:Int):Boolean = {
+			placeCallback(
+				Individual(
+					screenToTile(
+						new Vector3(
+							screenX,
+							Gdx.graphics.getHeight - screenY,
+							0
 						)
-						true
-					case Buttons.RIGHT =>
-						plexer.removeProcessor(this)
-						true
-					case _ => false
-				}
-			}
+					).topLeftPixels
+				)
+			)
+			true
+		}
+		override def leftClick(screenX:Int, screenY:Int, pointer:Int):Boolean = {
+			plexer.removeProcessor(this)
+			true
+		}
 		}
 
 	def screenToTile(screen:Vector3) = Tile.fromPixels(screen) + cam.getPosition - Tile(3,4)

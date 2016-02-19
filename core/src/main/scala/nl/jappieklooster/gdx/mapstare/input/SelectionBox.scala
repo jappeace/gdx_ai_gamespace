@@ -24,8 +24,8 @@ object SelectionBox{
 		new Rectangle(smallX, smallY, bigX - smallX, bigY - smallY)
 	}
 	val log = LoggerFactory.getLogger(classOf[SelectionBox])
+	def deselectUnits(world: World) = markUnitsAsSelected(world)(Point.zero,Point.zero)
 	def markUnitsAsSelected(world:World)(one:Point, two:Point)(implicit cam: Cam):Unit= {
-
 		val rectangle = toRectangle(cam.screenPointToWorld(one),cam.screenPointToWorld(two))
 		log.info(s"rectangle $rectangle")
 		world.units = world.units.map(unit =>
