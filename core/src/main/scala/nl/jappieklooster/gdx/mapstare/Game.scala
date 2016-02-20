@@ -42,7 +42,7 @@ class Game() extends ApplicationAdapter {
 	lazy val selectionController = new SelectionBox()
 	val updater = new Updater()
 	val stateMachine = new StateMachine()
-	val world = new World(Nil,Nil)
+	val world = new World()
 	lazy val plexer = new InputMultiplexer(camMoveController, stage, selectionController)
 
 	// allow anything that has access to the game to render shit
@@ -77,9 +77,6 @@ class Game() extends ApplicationAdapter {
 		}
 		world.units.foreach(animation.render(_, batch))
 		customRenders.foreach(_.render(batch))
-
-		log.info(ThreadIdentifier.identify)
-		actor ! "shit"
 
 		batch.end()
 		selectionController.render(batch)
