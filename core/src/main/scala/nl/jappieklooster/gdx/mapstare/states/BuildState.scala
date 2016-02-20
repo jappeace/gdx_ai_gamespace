@@ -29,7 +29,7 @@ class BuildState(game:Game) extends GameState(game){
 	}
 	// TODO: make this scalable (also multiple types of units, snould acutally be doable with a list)
 	val clickThing = new PlacementClick(
-			placeCallback = a=> world.units = world.units :+ a,
+			placeCallback = a=> world.units +=  a,
 			cam,
 			inputMultiplexer
 		)

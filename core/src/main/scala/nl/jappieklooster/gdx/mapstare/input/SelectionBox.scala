@@ -28,7 +28,7 @@ object SelectionBox{
 	def markUnitsAsSelected(world:World)(one:Point, two:Point)(implicit cam: Cam):Unit= {
 		val rectangle = toRectangle(cam.screenPointToWorld(one),cam.screenPointToWorld(two))
 		log.info(s"rectangle $rectangle")
-		world.units = world.units.map(unit =>
+		world.mapUnits(unit =>
 			unit.copy(selected = rectangle.contains(unit.position))
 		)
 	}
