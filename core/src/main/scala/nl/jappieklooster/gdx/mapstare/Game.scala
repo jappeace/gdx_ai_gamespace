@@ -1,5 +1,8 @@
 package nl.jappieklooster.gdx.mapstare
 
+import java.lang.Thread
+
+import _root_.akka.actor.{ActorSystem, Props}
 import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
@@ -10,15 +13,17 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.{InputMultiplexer, Input, ApplicationAdapter, Gdx}
 import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, BitmapFont}
+import akka.{ThreadIdentifier, ThreadIdentifyActor}
 import nl.jappieklooster.gdx.mapstare.controller.Updater
 import nl.jappieklooster.gdx.mapstare.input.gui.OnClick
 import nl.jappieklooster.gdx.mapstare.input._
 import nl.jappieklooster.gdx.mapstare.model._
 import nl.jappieklooster.gdx.mapstare.states.{BuildState, StateMachine}
-import nl.jappieklooster.gdx.mapstare.view.Animation
+import nl.jappieklooster.gdx.mapstare.view.{Renderable, Animation}
 import nl.jappieklooster.gdx.mapstare.controller._
 
 import com.badlogic.gdx.math._
+import org.slf4j.LoggerFactory
 
 class Game() extends ApplicationAdapter {
 	lazy val batch = new SpriteBatch()
@@ -39,6 +44,10 @@ class Game() extends ApplicationAdapter {
 	val stateMachine = new StateMachine()
 	val world = new World(Nil,Nil)
 	lazy val plexer = new InputMultiplexer(camMoveController, stage, selectionController)
+
+	// allow anything that has access to the game to render shit
+	var customRenders:Seq[Renderable] = Nil
+
 	override def create() = {
 		// TODO: replace the plexer with an own variant which uses an enum map??
 		stateMachine.changeTo(new BuildState(this))
@@ -52,6 +61,9 @@ class Game() extends ApplicationAdapter {
 		camMoveController.update(timeSinceLast)
 		cam.cam.update()
 	}
+	val actorSystem = ActorSystem("fancypantsactors")
+	lazy val actor =  actorSystem.actorOf(Props[ThreadIdentifyActor].withDispatcher("gdx-dispatcher"), "frame-actor")
+	private val log = LoggerFactory.getLogger(classOf[Game])
 	override def render() = {
 		update(GameTick(Gdx.graphics.getDeltaTime))
 
@@ -64,12 +76,17 @@ class Game() extends ApplicationAdapter {
 			font.draw(batch, s"(${pos.x},${pos.y})", pos.x,  pos.y  )
 		}
 		world.units.foreach(animation.render(_, batch))
+		customRenders.foreach(_.render(batch))
+
+		log.info(ThreadIdentifier.identify)
+		actor ! "shit"
 
 		batch.end()
 		selectionController.render(batch)
 		stage.act(Gdx.graphics.getDeltaTime)
 		stage.draw()
 	}
+
 	override def resize (width:Int, height:Int):Unit = {
 		println("resize")
 		cam.toOrtho(width, height)

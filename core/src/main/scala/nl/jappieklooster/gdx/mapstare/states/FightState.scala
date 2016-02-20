@@ -6,8 +6,9 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import nl.jappieklooster.gdx.mapstare.Cam
 import nl.jappieklooster.gdx.mapstare.controller.{MoveTo, Updateable, Updater}
 import nl.jappieklooster.gdx.mapstare.input._
-import nl.jappieklooster.gdx.mapstare.model.{World, GameTick}
+import nl.jappieklooster.gdx.mapstare.model.{Individual, World, GameTick}
 import nl.jappieklooster.gdx.mapstare.model.math._
+import nl.jappieklooster.gdx.mapstare.view.{Renderable, Animation}
 import org.slf4j.LoggerFactory
 import nl.jappieklooster.gdx.mapstare.Game
 
@@ -35,6 +36,14 @@ class FightState (game:Game) extends GameState(game){
 		}
 	}
 	override def enter(gameState: StateMachine): Unit ={
+		game.customRenders = game.customRenders :+ new Renderable {
+			var x = 0D
+			override def render(spriteBatch: SpriteBatch): Unit = {
+				x += 0.02D
+				Animation.line.setPosition(200 ,300+ (Math.sin(x) *50).toInt)
+				Animation.line.draw(spriteBatch)
+			}
+		}
 		game.selectionController.callback = SelectionBox.markUnitsAsSelected(game.world)
 		inputMultiplexer.addProcessor(clickHandler)
 	}

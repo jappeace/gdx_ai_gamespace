@@ -9,7 +9,10 @@ import nl.jappieklooster.gdx.mapstare.controller.IntervalledUpdatable
 import nl.jappieklooster.gdx.mapstare.model.math.Tile
 import nl.jappieklooster.gdx.mapstare.model.{GameTick, Positionable, Individual, Entity}
 
-class Animation(frametime:Float, sprites:Seq[Sprite], cam:Cam) {
+class Animation(frametime:Float, sprites:Seq[Sprite])(implicit cam:Cam) {
+	if(frametime == 0){
+		throw new Exception("division by zero imenent")
+	}
 	// FIXME: different unit types
 	def render(individual: Individual, spriteBatch:SpriteBatch) = {
 		val position = individual.position - cam.getPosition.topLeftPixels
@@ -32,6 +35,7 @@ object Animation{
 	val line = new Sprite(new Texture("line.png"),0,0,228,5)
 	val scale = new Vector2(0.1f,0.1f)
 	line.setScale(scale.x,scale.y)
+	val lineAnimation = new Animation(1,Seq(line))
 	def create(frametime:Float, frameCount:Int, frameWidth:Int, frameHeight:Int, texture:String)(implicit cam:Cam) = {
 		val spritesheet = new Texture(Gdx.files.internal(texture))
 		new Animation(
@@ -40,8 +44,7 @@ object Animation{
 				val result = new Sprite(spritesheet, x*frameWidth, 0, frameWidth, frameHeight)
 				result.setScale(scale.x,scale.y)
 				result
-			}),
-			cam
+			})
 		)
 	}
 }
