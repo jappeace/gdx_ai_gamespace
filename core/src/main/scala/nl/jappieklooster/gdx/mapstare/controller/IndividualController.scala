@@ -59,3 +59,11 @@ case class MoveTo(targetLocation: Circle) extends IndividualController{
 		result
 	}
 }
+object MoveTo{
+	/**
+	  * cause getting to points can be a little messy,
+	  * also floating point rounding bullshit
+	  */
+	val defaultErrorRadius = 5f
+	def apply(point: Point):MoveTo = MoveTo(Circle(point,defaultErrorRadius))
+}
