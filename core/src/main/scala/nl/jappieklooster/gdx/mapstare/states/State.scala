@@ -4,6 +4,9 @@ import nl.jappieklooster.gdx.mapstare.controller.Updateable
 import nl.jappieklooster.gdx.mapstare.model.GameTick
 import org.slf4j.LoggerFactory
 
+// TODO: does a State have to be updatable?
+// could we handle the updates entirely with callbacks? which is arguably faster
+// and eleganter..
 trait State extends Updateable{
 	def enter(stateMachine: StateMachine):Unit = {}
 	def exit():Unit = {}

@@ -14,14 +14,6 @@ import nl.jappieklooster.gdx.mapstare.Game
 
 class FightState (game:Game) extends GameState(game){
 	val log = LoggerFactory.getLogger(classOf[FightState])
-	/**
-	  *
-	  * @param tick
-	  * @return should keep updating?
-	  */
-	override def update(tick: GameTick): Boolean = {
-		true
-	}
 	val clickHandler = new MouseClickAdapter {
 		override def leftClick(screenX:Int, screenY:Int, pointer:Int) = {
 			true

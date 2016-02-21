@@ -17,16 +17,6 @@ import nl.jappieklooster.gdx.mapstare.Game
 
 class BuildState(game:Game) extends GameState(game){
 
-	lazy val skin = new Skin(Gdx.files.internal("uiskin.json"))
-	var animations:Seq[Animation] = Nil
-	lazy val selectionController = new SelectionBox(
-		(one:Point, two:Point)=>updater.targets = updater.targets :+ Updateable.functionToUpdatable((float:GameTick)=>true) )
-	val updater = new Updater()
-	var x = 0
-	def update(timeSinceLast:GameTick): Boolean={
-		selectionController.render(null)
-		true
-	}
 	// TODO: make this scalable (also multiple types of units, snould acutally be doable with a list)
 	val clickThing = new PlacementClick(
 			placeCallback = a=> world.units +=  a,
@@ -34,10 +24,11 @@ class BuildState(game:Game) extends GameState(game){
 			inputMultiplexer
 		)
 	override def enter(stateMachine: StateMachine):Unit = {
-		val button = new TextButton("Start!", skin, "default")
+		val builder = new UIFactory()
+		val button = builder.button("Start!")
 		button.setWidth(200)
 		button.setHeight(50)
-		val dialog = new Dialog("click message", skin)
+		val dialog = builder.dialog("click message")
 		dialog.addListener(OnClick(() => {
 			dialog.hide()
 		}
@@ -51,13 +42,12 @@ class BuildState(game:Game) extends GameState(game){
 		}
 		))
 
-		val scrolltable = new Table(skin)
-		val scrollpane = new ScrollPane(scrolltable, skin, "default")
-		val container = new Table(skin)
+		val (scrolltable, scrollpane) = builder.scrollPane()
+		val container = builder.table()
 		container.add(scrollpane).width(200).height(100)
 		container.row()
 		container.add(button)
-		val label = new TextButton("Swordman", skin, "default")
+		val label = builder.button("Start!")
 		label.addListener(
 			clickThing
 		)
