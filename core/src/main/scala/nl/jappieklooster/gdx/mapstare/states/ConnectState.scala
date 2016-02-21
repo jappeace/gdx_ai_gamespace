@@ -17,7 +17,11 @@
 
 package nl.jappieklooster.gdx.mapstare.states
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import nl.jappieklooster.gdx.mapstare.Game
+import nl.jappieklooster.gdx.mapstare.input.gui.OnClick
 import nl.jappieklooster.gdx.mapstare.model.GameTick
 
 /**
@@ -26,5 +30,26 @@ import nl.jappieklooster.gdx.mapstare.model.GameTick
 class ConnectState(game:Game) extends GameState(game){
 	override def enter(stateMachine: StateMachine):Unit = {
 		val factory = new UIFactory()
+
+		val container = factory.table()
+		container.add("Connect to a host to start or host yourself!!!").colspan(2)
+		container.row()
+		container.add("IP")
+		container.add(factory.textField("127.0.0.1"))
+		container.row()
+		val host = factory.button("Host")
+		host.addListener(OnClick({
+			println("click")
+		}))
+		val connect = factory.button("Connect")
+		connect.addListener(OnClick({
+			println("clack")
+		}))
+		container.add(host)
+		container.add(connect)
+		container.setWidth(400)
+		container.setHeight(200)
+		container.setPosition(Gdx.graphics.getWidth/2, Gdx.graphics.getHeight/2)
+		stage.addActor(container)
 	}
 }

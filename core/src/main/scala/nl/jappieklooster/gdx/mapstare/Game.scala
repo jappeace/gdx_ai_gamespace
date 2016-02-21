@@ -35,7 +35,7 @@ import nl.jappieklooster.gdx.mapstare.controller.Updater
 import nl.jappieklooster.gdx.mapstare.input.gui.OnClick
 import nl.jappieklooster.gdx.mapstare.input._
 import nl.jappieklooster.gdx.mapstare.model._
-import nl.jappieklooster.gdx.mapstare.states.{BuildState, StateMachine}
+import nl.jappieklooster.gdx.mapstare.states.{ConnectState, BuildState, StateMachine}
 import nl.jappieklooster.gdx.mapstare.view.{Renderable, Animation}
 import nl.jappieklooster.gdx.mapstare.controller._
 
@@ -67,7 +67,7 @@ class Game() extends ApplicationAdapter {
 
 	override def create() = {
 		// TODO: replace the plexer with an own variant which uses an enum map??
-		stateMachine.changeTo(new BuildState(this))
+		stateMachine.changeTo(new ConnectState(this))
 		updater.targets = updater.targets :+ stateMachine :+ new WorldUpdater(world)
 		Gdx.input.setInputProcessor(plexer)
 	}
