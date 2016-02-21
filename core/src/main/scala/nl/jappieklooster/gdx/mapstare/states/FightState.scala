@@ -36,7 +36,8 @@ class FightState (game:Game) extends GameState(game){
 			true
 		}
 		override def rightClick(screenX:Int, screenY:Int, pointer:Int):Boolean = {
-			world.mapUnits(x=> if(x.selected){
+			// TODO: update units
+			world.units.map(x=> if(x.selected){
 				x.copy(
 					controller = MoveTo(cam.screenToTile(cam.unproject(Point(screenX,screenY))).topLeftPixels)
 				)

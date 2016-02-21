@@ -30,7 +30,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.{InputMultiplexer, Input, ApplicationAdapter, Gdx}
 import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, BitmapFont}
-import akka.{ThreadIdentifier, ThreadIdentifyActor}
+import nl.jappieklooster.gdx.mapstare.akka.{UpdateClient, WorldUpdateActor, ThreadIdentifier, ThreadIdentifyActor}
 import nl.jappieklooster.gdx.mapstare.controller.Updater
 import nl.jappieklooster.gdx.mapstare.input.gui.OnClick
 import nl.jappieklooster.gdx.mapstare.input._
@@ -59,7 +59,6 @@ class Game() extends ApplicationAdapter {
 	lazy val selectionController = new SelectionBox()
 	val updater = new Updater()
 	val stateMachine = new StateMachine()
-	val world = new World()
 	lazy val plexer = new InputMultiplexer(camMoveController, stage, selectionController)
 
 	// allow anything that has access to the game to render shit
@@ -67,19 +66,23 @@ class Game() extends ApplicationAdapter {
 
 	override def create() = {
 		// TODO: replace the plexer with an own variant which uses an enum map??
-		stateMachine.changeTo(new ConnectState(this))
-		updater.targets = updater.targets :+ stateMachine :+ new WorldUpdater(world)
+		stateMachine.changeTo(new BuildState(this))
+		updater.targets = updater.targets :+ stateMachine
 		Gdx.input.setInputProcessor(plexer)
+		actorSystem.actorOf(Props(new UpdateClient(this)).withDispatcher("gdx-dispatcher"), UpdateClient.name)
 	}
 
 	var x = 0
+	var world = World.empty
 	def update(timeSinceLast:GameTick): Unit ={
 		updater.update(timeSinceLast)
 		camMoveController.update(timeSinceLast)
 		cam.cam.update()
+		updateActor ! timeSinceLast
 	}
-	val actorSystem = ActorSystem("fancypantsactors")
-	lazy val actor =  actorSystem.actorOf(Props[ThreadIdentifyActor].withDispatcher("gdx-dispatcher"), "frame-actor")
+	private val actorSystem = ActorSystem("fancypantsactors")
+
+	lazy val updateActor =  actorSystem.actorOf(Props[WorldUpdateActor], "updateActor")
 	private val log = LoggerFactory.getLogger(classOf[Game])
 	override def render() = {
 		update(GameTick(Gdx.graphics.getDeltaTime))

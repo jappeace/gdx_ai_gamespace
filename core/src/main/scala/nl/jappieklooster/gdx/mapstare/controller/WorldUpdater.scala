@@ -26,7 +26,7 @@ import nl.jappieklooster.gdx.mapstare.model.{GameTick, World}
  *
  * @param world
  */
-class WorldUpdater(world:World) extends Updateable {
+class WorldUpdater(val world:World) extends Updateable {
 	/**
 	 *
 	 * @param timeSinceLast

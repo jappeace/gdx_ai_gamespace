@@ -24,6 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui._
 import com.badlogic.gdx.math.Vector2
 import nl.jappieklooster.gdx.mapstare.Cam
+import nl.jappieklooster.gdx.mapstare.akka.Create
 import nl.jappieklooster.gdx.mapstare.controller.{Updateable, Updater}
 import nl.jappieklooster.gdx.mapstare.input.gui.OnClick
 import nl.jappieklooster.gdx.mapstare.input.{PlacementClick, SelectionBox, CamMovement}
@@ -36,7 +37,9 @@ class BuildState(game:Game) extends GameState(game){
 
 	// TODO: make this scalable (also multiple types of units, snould acutally be doable with a list)
 	val clickThing = new PlacementClick(
-			placeCallback = a=> world.units +=  a,
+			placeCallback = item=> {
+				game.updateActor ! new Create(item)
+			},
 			cam,
 			inputMultiplexer
 		)
@@ -64,7 +67,7 @@ class BuildState(game:Game) extends GameState(game){
 		container.add(scrollpane).width(200).height(100)
 		container.row()
 		container.add(button)
-		val label = factory.button("Start!")
+		val label = factory.button("swordman")
 		label.addListener(
 			clickThing
 		)

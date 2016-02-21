@@ -24,7 +24,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math._
 import nl.jappieklooster.gdx.mapstare.controller.Updater
 import nl.jappieklooster.gdx.mapstare.input.SelectionBox.SelectionCallback
-import nl.jappieklooster.gdx.mapstare.model.{Individual, World}
+import nl.jappieklooster.gdx.mapstare.model.{WorldState, Individual, World}
 import nl.jappieklooster.gdx.mapstare.view.Renderable
 import nl.jappieklooster.gdx.mapstare.Cam
 import org.slf4j.LoggerFactory
@@ -41,11 +41,12 @@ object SelectionBox{
 		new Rectangle(smallX, smallY, bigX - smallX, bigY - smallY)
 	}
 	val log = LoggerFactory.getLogger(classOf[SelectionBox])
-	def deselectUnits(world: World) = markUnitsAsSelected(world)(Point.zero,Point.zero)
-	def markUnitsAsSelected(world:World)(one:Point, two:Point)(implicit cam: Cam):Unit= {
+	def deselectUnits(world: WorldState) = markUnitsAsSelected(world)(Point.zero,Point.zero)
+	def markUnitsAsSelected(world:WorldState)(one:Point, two:Point)(implicit cam: Cam):Unit= {
 		val rectangle = toRectangle(cam.screenPointToWorld(one),cam.screenPointToWorld(two))
 		log.info(s"rectangle $rectangle")
-		world.mapUnits(unit =>
+		//TODO: update units
+		world.units.map(unit =>
 			unit.copy(selected = rectangle.contains(unit.position))
 		)
 	}
