@@ -23,6 +23,7 @@ class World() {
 	val entities = new ArrayBuffer[Entity](World.estmatedBuildingCount)
 	val units = new ArrayBuffer[Individual](World.estmatedBuildingCount)
 	def mapUnits(func:Individual => Individual) = {
+
 		val newUnits = units.map(func)
 		units.clear()
 		units.insertAll(0, newUnits)

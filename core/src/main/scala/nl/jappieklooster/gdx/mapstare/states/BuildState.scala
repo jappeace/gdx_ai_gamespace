@@ -41,16 +41,16 @@ class BuildState(game:Game) extends GameState(game){
 			inputMultiplexer
 		)
 	override def enter(stateMachine: StateMachine):Unit = {
-		val builder = new UIFactory()
-		val button = builder.button("Start!")
+		val factory = new UIFactory()
+		val button = factory.button("Start!")
 		button.setWidth(200)
 		button.setHeight(50)
-		val dialog = builder.dialog("click message")
-		dialog.addListener(OnClick(() => {
+		val dialog = factory.dialog("click message")
+		dialog.addListener(OnClick({
 			dialog.hide()
 		}
 		))
-		button.addListener(OnClick(() => {
+		button.addListener(OnClick({
 			if(world.units == Nil){
 				dialog.getTitleLabel.setText("No units made :s")
 				dialog.show(stage)
@@ -59,12 +59,12 @@ class BuildState(game:Game) extends GameState(game){
 		}
 		))
 
-		val (scrolltable, scrollpane) = builder.scrollPane()
-		val container = builder.table()
+		val (scrolltable, scrollpane) = factory.scrollPane()
+		val container = factory.table()
 		container.add(scrollpane).width(200).height(100)
 		container.row()
 		container.add(button)
-		val label = builder.button("Start!")
+		val label = factory.button("Start!")
 		label.addListener(
 			clickThing
 		)

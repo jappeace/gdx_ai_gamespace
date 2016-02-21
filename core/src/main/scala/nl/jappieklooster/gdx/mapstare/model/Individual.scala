@@ -34,7 +34,7 @@ case class Individual(
 		location:Point,
 		controller:IndividualController = DoNothing,
 		selected:Boolean = false,
-		livingTime:Float = 0 // in seconds, used for animations for example
+		livingTime:Float = 0 // in seconds, used for animations for example,
 ) extends Positionable{
 	override def position = location
 }
