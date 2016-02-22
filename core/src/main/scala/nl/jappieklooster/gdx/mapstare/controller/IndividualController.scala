@@ -28,6 +28,7 @@ case object DoNothing extends IndividualController{
 	def apply(gameTick: GameTick,ind: Individual) = {
 		ind
 	}
+	override def toString = "Doing nothing"
 }
 /**
   * The move controller lets the individual move according to its speed.
