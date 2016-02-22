@@ -36,12 +36,7 @@ class FightState (game:Game) extends GameState(game){
 			true
 		}
 		override def rightClick(screenX:Int, screenY:Int, pointer:Int):Boolean = {
-			// TODO: update units
-			world.units.map(x=> if(x.selected){
-				x.copy(
-					controller = MoveTo(cam.screenToTile(cam.unproject(Point(screenX,screenY))).topLeftPixels)
-				)
-			}else x)
+			game.updateActor ! MoveTo(cam.screenToTile(cam.unproject(Point(screenX,screenY))).topLeftPixels)
 			true
 		}
 	}
@@ -54,7 +49,9 @@ class FightState (game:Game) extends GameState(game){
 				Animation.line.draw(spriteBatch)
 			}
 		}
-		game.selectionController.callback = SelectionBox.markUnitsAsSelected(game.world)
+		game.selectionController.onSelect = (box:Rectangle) => {
+			game.updateActor ! box
+		}
 		inputMultiplexer.addProcessor(clickHandler)
 	}
 	override def exit():Unit = {

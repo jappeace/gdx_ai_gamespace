@@ -37,12 +37,12 @@ class Animation(frametime:Float, sprites:Seq[Sprite])(implicit cam:Cam) {
 		val sprite = sprites(currentFrame)
 		sprite.setPosition(position.x, position.y)
 		sprite.draw(spriteBatch)
-		if(individual.selected){
+		if(individual.selected) {
 			val offset = 10
 			import Animation._
-			line.setPosition(position.x,position.y + sprite.getHeight*0.56f)
+			line.setPosition(position.x, position.y + sprite.getHeight * 0.56f)
 			line.draw(spriteBatch)
-			line.setPosition(position.x,position.y + sprite.getHeight*0.441f)
+			line.setPosition(position.x, position.y + sprite.getHeight * 0.441f)
 			line.draw(spriteBatch)
 		}
 	}

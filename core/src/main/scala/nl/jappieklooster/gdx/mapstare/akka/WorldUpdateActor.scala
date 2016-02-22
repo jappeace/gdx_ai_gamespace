@@ -18,8 +18,10 @@
 package nl.jappieklooster.gdx.mapstare.akka
 import akka.actor.Actor
 import akka.actor.Actor.Receive
-import nl.jappieklooster.gdx.mapstare.controller.WorldUpdater
+import nl.jappieklooster.gdx.mapstare.controller.{MoveTo, WorldUpdater}
+import nl.jappieklooster.gdx.mapstare.input.SelectionBox
 import nl.jappieklooster.gdx.mapstare.model._
+import nl.jappieklooster.gdx.mapstare.model.math.Rectangle
 import org.slf4j.LoggerFactory
 
 /**
@@ -29,7 +31,8 @@ import org.slf4j.LoggerFactory
   * local information about the world, you go to him.
   */
 class WorldUpdateActor extends Actor{
-	val updater = new WorldUpdater(new World())
+	val world = new World()
+	val updater = new WorldUpdater(world)
 	val log = LoggerFactory.getLogger(classOf[WorldUpdateActor])
 	override def receive: Receive = {
 		// We received a tick, update the world and the latest state
@@ -40,12 +43,17 @@ class WorldUpdateActor extends Actor{
 			// message should *not* be send over a network.
 			val newWorld = updater.world.copy()
 			context.actorSelection("../"+UpdateClient.name) ! newWorld
-		case Create(unit:Individual) =>
-			updater.world.units += unit
+		case Create(unit:Positionable) =>
 			log.info(s"creating $unit")
-		case Create(ent:Entity) => updater.world.entities += ent
-		case Update(id:Int, unit:Individual) => updater.world.units(id) = unit
-		case Update(id:Int, ent:Entity) => updater.world.entities(id) = ent
+			world.insert(unit)
+		case box:Rectangle => SelectionBox.markUnitsAsSelected(updater.world)(box)
+		case command:MoveTo =>
+			log.info(s"executing $command")
+			updater.world.mapUnits(x=> if(x.selected){
+				x.copy(
+					controller = command.copy()
+				)
+			}else x)
 		case _ => log.warn(s"received unkown message")
 	}
 }

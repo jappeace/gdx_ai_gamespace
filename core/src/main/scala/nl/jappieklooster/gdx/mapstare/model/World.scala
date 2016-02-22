@@ -20,20 +20,20 @@ package nl.jappieklooster.gdx.mapstare.model
 import scala.collection.mutable.ArrayBuffer
 
 class World(from:WorldState = World.empty) {
-	val entities = new ArrayBuffer[Entity](World.estmatedBuildingCount)
-	val units = new ArrayBuffer[Individual](World.estmatedBuildingCount)
+	var entities = from.entities
+	var units = from.units
 
-	entities ++= from.entities
-	units ++= from.units
 
 	def mapUnits(func:Individual => Individual) = {
-
-		val newUnits = units.map(func)
-		units.clear()
-		units ++= newUnits
+		units = units.map(func)
 	}
-
-	def copy() = WorldState(entities.toSeq, units.toSeq)
+	def insert(positionable: Positionable) = {
+		positionable match {
+			case unit:Individual => units = unit +: units
+			case ent:Entity => entities = ent +: entities
+		}
+	}
+	def copy() = WorldState(entities, units)
 }
 object World {
 	// just give the buffers a bunch of space

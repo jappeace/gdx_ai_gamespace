@@ -21,7 +21,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.math._
 import nl.jappieklooster.gdx.mapstare.controller.Updater
 import nl.jappieklooster.gdx.mapstare.input.SelectionBox.SelectionCallback
 import nl.jappieklooster.gdx.mapstare.model.{WorldState, Individual, World}
@@ -31,27 +30,18 @@ import org.slf4j.LoggerFactory
 import nl.jappieklooster.gdx.mapstare.model.math._
 
 object SelectionBox{
-	def noCallback(one:Point, two:Point):Unit = {}
-	type SelectionCallback = (Point, Point)=>Unit
-	def toRectangle(one:Point, two:Point):Rectangle = {
-		val smallX = if(one.x<two.x)one.x else two.x
-		val smallY = if(one.y<two.y)one.y else two.y
-		val bigX = if(one.x>two.x)one.x else two.x
-		val bigY = if(one.y>two.y)one.y else two.y
-		new Rectangle(smallX, smallY, bigX - smallX, bigY - smallY)
-	}
+	def noCallback(box:Rectangle):Unit = {}
+	type SelectionCallback = (Rectangle)=>Unit
 	val log = LoggerFactory.getLogger(classOf[SelectionBox])
-	def deselectUnits(world: WorldState) = markUnitsAsSelected(world)(Point.zero,Point.zero)
-	def markUnitsAsSelected(world:WorldState)(one:Point, two:Point)(implicit cam: Cam):Unit= {
-		val rectangle = toRectangle(cam.screenPointToWorld(one),cam.screenPointToWorld(two))
-		log.info(s"rectangle $rectangle")
-		//TODO: update units
-		world.units.map(unit =>
+	def deselectUnits(world: World) = markUnitsAsSelected(world)(Rectangle.zero)
+	def markUnitsAsSelected(world:World)(rectangle: Rectangle):Unit= {
+		log.trace(s"rectangle $rectangle")
+		world.mapUnits(unit =>
 			unit.copy(selected = rectangle.contains(unit.position))
 		)
 	}
 }
-class SelectionBox(var callback:SelectionCallback= SelectionBox.noCallback _)(implicit cam:Cam) extends InputAdapter with Renderable{
+class SelectionBox(var onSelect:SelectionCallback= SelectionBox.noCallback _)(implicit cam:Cam) extends InputAdapter with Renderable{
 
 	lazy val shapeRenderer = {
 		val rend = new ShapeRenderer()
@@ -71,7 +61,7 @@ class SelectionBox(var callback:SelectionCallback= SelectionBox.noCallback _)(im
 	}
 	override def touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = {
 		for(s <- start; e <- end){
-			callback(s,e)
+			onSelect(Rectangle(cam.screenPointToWorld(s),cam.screenPointToWorld(e)))
 		}
 		start = None
 		end = None
