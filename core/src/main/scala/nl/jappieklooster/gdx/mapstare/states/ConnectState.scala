@@ -17,10 +17,13 @@
 
 package nl.jappieklooster.gdx.mapstare.states
 
+import akka.actor.{ActorSystem, Props}
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import nl.jappieklooster.gdx.mapstare.Game
+import nl.jappieklooster.gdx.mapstare.akka.{UpdateClient, WorldUpdateActor}
+import nl.jappieklooster.gdx.mapstare.controller.{Updateable, Updater}
 import nl.jappieklooster.gdx.mapstare.input.gui.OnClick
 import nl.jappieklooster.gdx.mapstare.model.GameTick
 
@@ -28,6 +31,9 @@ import nl.jappieklooster.gdx.mapstare.model.GameTick
   * Connect or start a server
   */
 class ConnectState(game:Game) extends GameState(game){
+
+	val actorSystem = ActorSystem("fancypantsactors")
+
 	override def enter(stateMachine: StateMachine):Unit = {
 		val factory = new UIFactory()
 
@@ -40,6 +46,14 @@ class ConnectState(game:Game) extends GameState(game){
 		val host = factory.button("Host")
 		host.addListener(OnClick({
 			println("click")
+			val updateActor =  actorSystem.actorOf(Props[WorldUpdateActor], "updateActor")
+			game.updater.add((tick:GameTick) => {
+				updateActor ! tick
+				true
+			})
+			game.updateActor.actor = Option(updateActor)
+			actorSystem.actorOf(Props(new UpdateClient(game)).withDispatcher("gdx-dispatcher"), UpdateClient.name)
+			stateMachine.changeTo(new BuildState(game))
 		}))
 		val connect = factory.button("Connect")
 		connect.addListener(OnClick({
@@ -51,5 +65,8 @@ class ConnectState(game:Game) extends GameState(game){
 		container.setHeight(200)
 		container.setPosition(Gdx.graphics.getWidth/2, Gdx.graphics.getHeight/2)
 		stage.addActor(container)
+	}
+	override def exit():Unit = {
+		stage.getRoot.clear()
 	}
 }

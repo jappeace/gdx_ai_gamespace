@@ -52,4 +52,7 @@ class Updater(var targets:Seq[Updateable]=Nil) extends Updateable{
 		targets = targets.filter(_.update(timeSinceLast))
 		targets.nonEmpty
 	}
+	def add(func:(GameTick=>Boolean)):Unit = {
+		targets = Updateable.functionToUpdatable(func) +: targets
+	}
 }

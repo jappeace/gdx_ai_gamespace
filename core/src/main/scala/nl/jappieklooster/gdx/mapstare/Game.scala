@@ -19,7 +19,7 @@ package nl.jappieklooster.gdx.mapstare
 
 import java.lang.Thread
 
-import _root_.akka.actor.{ActorSystem, Props}
+import _root_.akka.actor.{ActorRef, ActorSystem, Props}
 import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
@@ -30,7 +30,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.{InputMultiplexer, Input, ApplicationAdapter, Gdx}
 import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, BitmapFont}
-import nl.jappieklooster.gdx.mapstare.akka.{UpdateClient, WorldUpdateActor, ThreadIdentifier, ThreadIdentifyActor}
+import nl.jappieklooster.gdx.mapstare.akka._
 import nl.jappieklooster.gdx.mapstare.controller.Updater
 import nl.jappieklooster.gdx.mapstare.input.gui.OnClick
 import nl.jappieklooster.gdx.mapstare.input._
@@ -66,10 +66,9 @@ class Game() extends ApplicationAdapter {
 
 	override def create() = {
 		// TODO: replace the plexer with an own variant which uses an enum map??
-		stateMachine.changeTo(new BuildState(this))
+		stateMachine.changeTo(new ConnectState(this))
 		updater.targets = updater.targets :+ stateMachine
 		Gdx.input.setInputProcessor(plexer)
-		actorSystem.actorOf(Props(new UpdateClient(this)).withDispatcher("gdx-dispatcher"), UpdateClient.name)
 	}
 
 	var x = 0
@@ -78,11 +77,9 @@ class Game() extends ApplicationAdapter {
 		updater.update(timeSinceLast)
 		camMoveController.update(timeSinceLast)
 		cam.cam.update()
-		updateActor ! timeSinceLast
 	}
-	private val actorSystem = ActorSystem("fancypantsactors")
 
-	lazy val updateActor =  actorSystem.actorOf(Props[WorldUpdateActor], "updateActor")
+	val updateActor = new ActorFacade
 	private val log = LoggerFactory.getLogger(classOf[Game])
 	override def render() = {
 		update(GameTick(Gdx.graphics.getDeltaTime))
