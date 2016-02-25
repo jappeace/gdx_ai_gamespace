@@ -22,7 +22,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import nl.jappieklooster.gdx.mapstare.Game
-import nl.jappieklooster.gdx.mapstare.akka.{UpdateClient, WorldUpdateActor}
+import nl.jappieklooster.gdx.mapstare.akka.{RegisterUpdateClient, UpdateClient, WorldUpdateActor}
 import nl.jappieklooster.gdx.mapstare.controller.{Updateable, Updater}
 import nl.jappieklooster.gdx.mapstare.input.gui.OnClick
 import nl.jappieklooster.gdx.mapstare.model.GameTick
@@ -41,23 +41,33 @@ class ConnectState(game:Game) extends GameState(game){
 		container.add("Connect to a host to start or host yourself!!!").colspan(2)
 		container.row()
 		container.add("IP")
-		container.add(factory.textField("127.0.0.1"))
+		val ipField = factory.textField("127.0.0.1")
+		container.add(ipField)
 		container.row()
 		val host = factory.button("Host")
+		val updateActorName = "updateActor"
+		def registerClient() = {
+			val updateClientRef = actorSystem.actorOf(Props(new UpdateClient(game)).withDispatcher("gdx-dispatcher"), UpdateClient.name)
+			game.updateActor ! RegisterUpdateClient(updateClientRef.path)
+			stateMachine.changeTo(new BuildState(game))
+
+		}
 		host.addListener(OnClick({
 			println("click")
-			val updateActor =  actorSystem.actorOf(Props[WorldUpdateActor], "updateActor")
+			val updateActor =  actorSystem.actorOf(Props[WorldUpdateActor], updateActorName)
 			game.updater.add((tick:GameTick) => {
 				updateActor ! tick
 				true
 			})
-			game.updateActor.actor = Option(updateActor)
-			actorSystem.actorOf(Props(new UpdateClient(game)).withDispatcher("gdx-dispatcher"), UpdateClient.name)
-			stateMachine.changeTo(new BuildState(game))
+			game.updateActor.actor = Option(actorSystem.actorSelection(updateActor.path))
+			registerClient()
 		}))
 		val connect = factory.button("Connect")
 		connect.addListener(OnClick({
-			println("clack")
+			val ip = ipField.getText
+			import akka.remote.RemoteScope
+			game.updateActor.actor = Option(actorSystem.actorSelection(s"akka.tcp://${actorSystem.name}@$ip:2552/user/$updateActorName"))
+			registerClient()
 		}))
 		container.add(host)
 		container.add(connect)

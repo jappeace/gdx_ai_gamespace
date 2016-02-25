@@ -16,7 +16,7 @@
 
 
 package nl.jappieklooster.gdx.mapstare.akka
-import akka.actor.Actor
+import akka.actor.{ActorPath, ActorSelection, Actor}
 import akka.actor.Actor.Receive
 import nl.jappieklooster.gdx.mapstare.controller.{MoveTo, WorldUpdater}
 import nl.jappieklooster.gdx.mapstare.input.SelectionBox
@@ -34,6 +34,7 @@ class WorldUpdateActor extends Actor{
 	val world = new World()
 	val updater = new WorldUpdater(world)
 	val log = LoggerFactory.getLogger(classOf[WorldUpdateActor])
+	private var updateClients:Seq[ActorSelection] = Nil
 	override def receive: Receive = {
 		// We received a tick, update the world and the latest state
 		case tick:GameTick =>
@@ -42,10 +43,17 @@ class WorldUpdateActor extends Actor{
 			// It is possible to send the entire state, because the gametick
 			// message should *not* be send over a network.
 			val newWorld = updater.world.copy()
-			context.actorSelection("../"+UpdateClient.name) ! newWorld
+
+			for(client <- updateClients){
+				client ! newWorld
+			}
+
+		case RegisterUpdateClient(path) => updateClients = context.actorSelection(path) +: updateClients
+
 		case Create(unit:Positionable) =>
 			log.info(s"creating $unit")
 			world.insert(unit)
+
 		case box:Rectangle => SelectionBox.markUnitsAsSelected(updater.world)(box)
 		case command:MoveTo =>
 			log.info(s"executing $command")
@@ -58,9 +66,4 @@ class WorldUpdateActor extends Actor{
 	}
 }
 case class Create[T <: Positionable](what:T)
-case class Update[T <: Positionable](id:Int, to:T)
-// TODO: delete, use a case class with an int to identitfy which, then push
-// that int on a stack, then on antoher create use that int to update the
-// propper reference. Just make sure that the reference is marked dead before
-// deleting (so we draw a dead animation that is not controlable instead of
-// a living unit).
+case class RegisterUpdateClient(name:ActorPath)
