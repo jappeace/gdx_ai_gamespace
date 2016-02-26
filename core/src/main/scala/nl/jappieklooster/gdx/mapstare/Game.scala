@@ -102,7 +102,6 @@ class Game() extends ApplicationAdapter {
 	}
 
 	override def resize (width:Int, height:Int):Unit = {
-		println("resize")
 		cam.toOrtho(width, height)
 		stage.getViewport.update(width, height, true)
 	}
