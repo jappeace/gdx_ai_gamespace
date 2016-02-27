@@ -45,9 +45,13 @@ class ConnectState(game:Game) extends GameState(game){
 		val container = factory.table()
 		container.add("Connect to a host to start or host yourself!!!").colspan(2)
 		container.row()
-		container.add("IP")
-		val ipField = factory.textField("127.0.0.1")
-		container.add(ipField)
+		container.add("Host IP")
+		val hostIpField = factory.textField("127.0.0.1")
+		container.add(hostIpField)
+		container.row()
+		container.add("my IP")
+		val myIpField = factory.textField("127.0.0.1")
+		container.add(myIpField)
 		container.row()
 		val host = factory.button("Host")
 		val updateActorName = "updateActor"
@@ -71,10 +75,16 @@ class ConnectState(game:Game) extends GameState(game){
 		val connect = factory.button("Connect")
 		connect.addListener(OnClick({
 			val sys = ActorSystem("clientSystem", ConfigFactory.load("client"))
-			val ip = ipField.getText
-			game.updateActor.actor = Option(sys.actorSelection(s"akka.tcp://$updateSys@$ip:2552/user/$updateActorName"))
+			val ip = hostIpField.getText
+			val my = myIpField.getText
+			val port = 2552
+			game.updateActor.actor = Option(sys.actorSelection(s"akka.tcp://$updateSys@$ip:$port/user/$updateActorName"))
 			val client = sys.actorOf(Props(new UpdateClient(game)).withDispatcher("gdx-dispatcher"), UpdateClient.name)
-			registerClient(client.path.toStringWithAddress(client.path.address.copy(protocol = "akka.tcp")))
+			registerClient(client.path.toStringWithAddress(client.path.address.copy(
+				protocol = "akka.tcp",
+				port = Option(2553),
+				host = Option(my)
+			)))
 		}))
 		container.add(host)
 		container.add(connect)

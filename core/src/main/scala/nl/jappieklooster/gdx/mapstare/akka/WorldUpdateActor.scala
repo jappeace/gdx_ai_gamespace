@@ -48,7 +48,9 @@ class WorldUpdateActor extends Actor{
 				client ! newWorld
 			}
 
-		case RegisterUpdateClient(path) => updateClients = context.actorSelection(path) +: updateClients
+		case RegisterUpdateClient(path) =>
+			val select = context.actorSelection(path)
+			updateClients = select +: updateClients
 
 		case Create(unit:Positionable) =>
 			log.info(s"creating $unit")
@@ -67,3 +69,7 @@ class WorldUpdateActor extends Actor{
 }
 case class Create[T <: Positionable](what:T)
 case class RegisterUpdateClient(name:String)
+object RegisterUpdateClient{
+	val hosttext = "clientip"
+	val defaultHost = "0.0.0.0"
+}
