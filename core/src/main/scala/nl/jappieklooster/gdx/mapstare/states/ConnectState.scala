@@ -17,7 +17,9 @@
 
 package nl.jappieklooster.gdx.mapstare.states
 
-import akka.actor.{Address, ActorSystem, Props}
+import java.net.InetAddress
+
+import akka.actor._
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
@@ -28,6 +30,7 @@ import nl.jappieklooster.gdx.mapstare.controller.{Updateable, Updater}
 import nl.jappieklooster.gdx.mapstare.input.gui.OnClick
 import nl.jappieklooster.gdx.mapstare.model.GameTick
 import org.slf4j.LoggerFactory
+
 
 /**
   * Connect or start a server
@@ -48,30 +51,30 @@ class ConnectState(game:Game) extends GameState(game){
 		container.row()
 		val host = factory.button("Host")
 		val updateActorName = "updateActor"
-		def registerClient(system:ActorSystem) = {
-			val updateClientRef = system.actorOf(Props(new UpdateClient(game)).withDispatcher("gdx-dispatcher"), UpdateClient.name)
-			game.updateActor ! RegisterUpdateClient(updateClientRef.path)
+		def registerClient(path: String) = {
+			game.updateActor ! RegisterUpdateClient(path)
 			stateMachine.changeTo(new BuildState(game))
-
 		}
 		val updateSys = "updateSystem"
 		host.addListener(OnClick({
-			val actorSystem = ActorSystem(updateSys, ConfigFactory.load("host"))
-			val updateActor =  actorSystem.actorOf(Props[WorldUpdateActor], updateActorName)
+			val sys = ActorSystem(updateSys, ConfigFactory.load("host"))
+			val updateActor =  sys.actorOf(Props[WorldUpdateActor], updateActorName)
 			log.info(s"creating update actor: ${updateActor.path.toStringWithAddress(Address("akka.tcp", updateSys, "localhost", 2552))}")
 			game.updater.add((tick:GameTick) => {
 				updateActor ! tick
 				true
 			})
-			game.updateActor.actor = Option(actorSystem.actorSelection(updateActor.path))
-			registerClient(actorSystem)
+			game.updateActor.actor = Option(sys.actorSelection(updateActor.path))
+			val client = sys.actorOf(Props(new UpdateClient(game)).withDispatcher("gdx-dispatcher"), UpdateClient.name)
+			registerClient(client.path.toStringWithoutAddress)
 		}))
 		val connect = factory.button("Connect")
 		connect.addListener(OnClick({
-			val actorSystem = ActorSystem("clientSystem", ConfigFactory.load("client"))
+			val sys = ActorSystem("clientSystem", ConfigFactory.load("client"))
 			val ip = ipField.getText
-			game.updateActor.actor = Option(actorSystem.actorSelection(s"akka.tcp://$updateSys@$ip:2552/user/$updateActorName"))
-			registerClient(actorSystem)
+			game.updateActor.actor = Option(sys.actorSelection(s"akka.tcp://$updateSys@$ip:2552/user/$updateActorName"))
+			val client = sys.actorOf(Props(new UpdateClient(game)).withDispatcher("gdx-dispatcher"), UpdateClient.name)
+			registerClient(client.path.toStringWithAddress(client.path.address.copy(protocol = "akka.tcp")))
 		}))
 		container.add(host)
 		container.add(connect)

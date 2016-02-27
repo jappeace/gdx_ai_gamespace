@@ -66,4 +66,4 @@ class WorldUpdateActor extends Actor{
 	}
 }
 case class Create[T <: Positionable](what:T)
-case class RegisterUpdateClient(name:ActorPath)
+case class RegisterUpdateClient(name:String)
