@@ -58,9 +58,13 @@ project(":core") {
         // logger facade
         compile "org.slf4j:slf4j-api:1.7.16"
 
+
         // netowrking and threading
-        compile group: 'com.typesafe.akka', name: 'akka-actor_2.11', version: '2.4.2'
-        compile group: 'com.typesafe.akka', name: 'akka-remote_2.11', version: '2.4.2'
+        def akkaVersion = '2.3.14' // older version because we want to be able to use JDK 7 (JDK 8 is a pain in the arse to install)
+        compile group: 'com.typesafe.akka', name: 'akka-actor_2.11', version: akkaVersion
+        compile group: 'com.typesafe.akka', name: 'akka-remote_2.11', version: akkaVersion
+
+        // testing
         compile group: 'org.scalatest', name: 'scalatest_2.11', version: '2.2.6'
     }
 }
