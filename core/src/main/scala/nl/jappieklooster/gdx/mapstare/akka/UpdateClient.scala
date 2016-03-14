@@ -45,7 +45,15 @@ class UpdateClient(game:Game) extends Actor with Logging{
 
   def ready(socket: ActorRef): Receive = {
     case Udp.Received(data, remote) =>
-		game.world = data.map(_.toChar).mkString.unpickle[WorldState]
+		val json = data.map(_.toChar).mkString
+		try {
+			game.world = json.unpickle[WorldState]
+		}catch{
+			case c:ClassCastException =>
+				log.info(s"couldn't cast: $json")
+				throw c
+			case x:Throwable => throw x
+		}
     case Udp.Unbind  => socket ! Udp.Unbind
     case Udp.Unbound => context.stop(self)
   }
