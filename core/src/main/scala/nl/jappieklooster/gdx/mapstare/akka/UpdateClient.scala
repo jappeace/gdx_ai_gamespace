@@ -16,23 +16,41 @@
 
 
 package nl.jappieklooster.gdx.mapstare.akka
-import akka.actor.Actor
+
+import java.net.InetSocketAddress
+
+import akka.actor.{ActorRef, Actor}
 import akka.actor.Actor.Receive
-import nl.jappieklooster.gdx.mapstare.Game
+import akka.util.ByteString
+import nl.jappieklooster.gdx.mapstare.{Logging, Game}
 import nl.jappieklooster.gdx.mapstare.model.{WorldState, World}
+
+import scala.pickling.Defaults._
+import scala.pickling.json._
+import akka.io._
 
 /**
   * This guy should run on the same thread as the render loop and updates
   * the worldstate. It receives the world (or any other state) and makes
   * the game awere of it.
+  *
   * @param game
   */
-class UpdateClient(game:Game) extends Actor{
+class UpdateClient(game:Game) extends Actor with Logging{
+	IO(Udp)(context.system) ! Udp.Bind(self, UpdateClient.localhost)
+  def receive = {
+    case Udp.Bound(local) =>
+      context.become(ready(sender()))
+  }
 
-	override def receive: Receive = {
-		case world:WorldState => game.world = world
-	}
+  def ready(socket: ActorRef): Receive = {
+    case Udp.Received(data, remote) =>
+		game.world = data.map(_.toChar).mkString.unpickle[WorldState]
+    case Udp.Unbind  => socket ! Udp.Unbind
+    case Udp.Unbound => context.stop(self)
+  }
 }
 object  UpdateClient{
 	val name = "updateClient"
+	val localhost = new InetSocketAddress("localhost", 2554)
 }

@@ -17,7 +17,7 @@
 
 package nl.jappieklooster.gdx.mapstare.states
 
-import java.net.InetAddress
+import java.net.{InetSocketAddress, InetAddress}
 
 import akka.actor._
 import com.badlogic.gdx.Gdx
@@ -25,7 +25,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.typesafe.config.ConfigFactory
 import nl.jappieklooster.gdx.mapstare.Game
-import nl.jappieklooster.gdx.mapstare.akka.{RegisterUpdateClient, UpdateClient, WorldUpdateActor}
+import nl.jappieklooster.gdx.mapstare.akka.{WorldBroadcastActor, RegisterUpdateClient, UpdateClient, WorldUpdateActor}
 import nl.jappieklooster.gdx.mapstare.controller.{Updateable, Updater}
 import nl.jappieklooster.gdx.mapstare.input.gui.OnClick
 import nl.jappieklooster.gdx.mapstare.model.GameTick
@@ -55,8 +55,8 @@ class ConnectState(game:Game) extends GameState(game){
 		container.row()
 		val host = factory.button("Host")
 		val updateActorName = "updateActor"
-		def registerClient(path: String) = {
-			game.updateActor ! RegisterUpdateClient(path)
+		def changeState(inet:InetSocketAddress) = {
+			game.updateActor ! RegisterUpdateClient(inet)
 			stateMachine.changeTo(new BuildState(game))
 		}
 		val updateSys = "updateSystem"
@@ -70,7 +70,9 @@ class ConnectState(game:Game) extends GameState(game){
 			})
 			game.updateActor.actor = Option(sys.actorSelection(updateActor.path))
 			val client = sys.actorOf(Props(new UpdateClient(game)).withDispatcher("gdx-dispatcher"), UpdateClient.name)
-			registerClient(client.path.toStringWithoutAddress)
+			import akka.io._
+
+			changeState(UpdateClient.localhost)
 		}))
 		val connect = factory.button("Connect")
 		connect.addListener(OnClick({
@@ -80,11 +82,7 @@ class ConnectState(game:Game) extends GameState(game){
 			val port = 2552
 			game.updateActor.actor = Option(sys.actorSelection(s"akka.tcp://$updateSys@$ip:$port/user/$updateActorName"))
 			val client = sys.actorOf(Props(new UpdateClient(game)).withDispatcher("gdx-dispatcher"), UpdateClient.name)
-			registerClient(client.path.toStringWithAddress(client.path.address.copy(
-				protocol = "akka.tcp",
-				port = Option(2553),
-				host = Option(my)
-			)))
+			changeState(UpdateClient.localhost)
 		}))
 		container.add(host)
 		container.add(connect)

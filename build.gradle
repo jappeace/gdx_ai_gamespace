@@ -48,8 +48,9 @@ project(":core") {
 
 
     dependencies {
+        def scalaVersion = '2.11'
         // core language
-		compile "org.scala-lang:scala-library-all:2.11.7"
+		compile "org.scala-lang:scala-library-all:$scalaVersion.7"
 
         // gdx game engine
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
@@ -61,11 +62,14 @@ project(":core") {
 
         // netowrking and threading
         def akkaVersion = '2.3.14' // older version because we want to be able to use JDK 7 (JDK 8 is a pain in the arse to install)
-        compile group: 'com.typesafe.akka', name: 'akka-actor_2.11', version: akkaVersion
-        compile group: 'com.typesafe.akka', name: 'akka-remote_2.11', version: akkaVersion
+        compile group: 'com.typesafe.akka', name: "akka-actor_$scalaVersion", version: akkaVersion
+        compile group: 'com.typesafe.akka', name: "akka-remote_$scalaVersion", version: akkaVersion
+
+        // JSON serialization
+        compile group: 'org.scala-lang.modules', name: "scala-pickling_$scalaVersion", version: '0.10.1'
 
         // testing
-        compile group: 'org.scalatest', name: 'scalatest_2.11', version: '2.2.6'
+        compile group: 'org.scalatest', name: "scalatest_$scalaVersion", version: '2.2.6'
     }
 }
 

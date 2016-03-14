@@ -16,8 +16,12 @@
 
 
 package nl.jappieklooster.gdx.mapstare.akka
-import akka.actor.{ActorPath, ActorSelection, Actor}
+
+import java.net.InetSocketAddress
+
+import akka.actor._
 import akka.actor.Actor.Receive
+import nl.jappieklooster.gdx.mapstare.Logging
 import nl.jappieklooster.gdx.mapstare.controller.{MoveTo, WorldUpdater}
 import nl.jappieklooster.gdx.mapstare.input.SelectionBox
 import nl.jappieklooster.gdx.mapstare.model._
@@ -30,11 +34,10 @@ import org.slf4j.LoggerFactory
   * If you want to change the world you go to him. If you want to verify your
   * local information about the world, you go to him.
   */
-class WorldUpdateActor extends Actor{
+class WorldUpdateActor extends Actor with Logging{
+	val broadcaster = context.system.actorOf(Props[WorldBroadcastActor])
 	val world = new World()
 	val updater = new WorldUpdater(world)
-	val log = LoggerFactory.getLogger(classOf[WorldUpdateActor])
-	private var updateClients:Seq[ActorSelection] = Nil
 	override def receive: Receive = {
 		// We received a tick, update the world and the latest state
 		case tick:GameTick =>
@@ -43,14 +46,7 @@ class WorldUpdateActor extends Actor{
 			// It is possible to send the entire state, because the gametick
 			// message should *not* be send over a network.
 			val newWorld = updater.world.copy()
-
-			for(client <- updateClients){
-				client ! newWorld
-			}
-
-		case RegisterUpdateClient(path) =>
-			val select = context.actorSelection(path)
-			updateClients = select +: updateClients
+			broadcaster ! newWorld
 
 		case Create(unit:Positionable) =>
 			log.info(s"creating $unit")
@@ -64,12 +60,9 @@ class WorldUpdateActor extends Actor{
 					controller = command.copy()
 				)
 			}else x)
+		case x:RegisterUpdateClient => broadcaster ! x
 		case _ => log.warn(s"received unkown message")
 	}
 }
 case class Create[T <: Positionable](what:T)
-case class RegisterUpdateClient(name:String)
-object RegisterUpdateClient{
-	val hosttext = "clientip"
-	val defaultHost = "0.0.0.0"
-}
+case class RegisterUpdateClient(name:InetSocketAddress)
