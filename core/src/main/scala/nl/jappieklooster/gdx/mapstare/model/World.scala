@@ -42,4 +42,4 @@ object World {
 	val empty = WorldState(Nil,Nil)
 }
 
-case class WorldState(entities: Seq[Entity], units:Seq[Individual])
+case class WorldState(entities: List[Entity], units:List[Individual])

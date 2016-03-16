@@ -17,7 +17,7 @@
 
 package nl.jappieklooster.gdx.mapstare.akka
 
-import java.net.InetSocketAddress
+import java.net.{DatagramSocket, ServerSocket, InetSocketAddress}
 
 import akka.actor.{ActorRef, Actor}
 import akka.actor.Actor.Receive
@@ -27,6 +27,7 @@ import nl.jappieklooster.gdx.mapstare.model.{WorldState, World}
 
 import scala.pickling.Defaults._
 import scala.pickling.json._
+import scala.pickling.static._
 import akka.io._
 
 /**
@@ -49,6 +50,9 @@ class UpdateClient(game:Game) extends Actor with Logging{
 		try {
 			game.world = json.unpickle[WorldState]
 		}catch{
+			case b:InstantiationException =>
+				log.info(s"couldn't instantiate: $json")
+				throw b
 			case c:ClassCastException =>
 				log.info(s"couldn't cast: $json")
 				throw c
@@ -60,5 +64,44 @@ class UpdateClient(game:Game) extends Actor with Logging{
 }
 object  UpdateClient{
 	val name = "updateClient"
-	val localhost = new InetSocketAddress("localhost", 2554)
+	val localhost = {
+
+		new InetSocketAddress("localhost", 2554)
+	}
+	val minPort = 1100
+	val maxPort = 49151
+	/**
+	  * Checks to see if a specific port is available.
+	  *
+	  * @param port the port to check for availability
+	  */
+	def available(port:Int):Boolean = {
+		if (port < minPort || port > maxPort){
+			return false
+		}
+		import java.io.IOException;
+		var ss:Option[ServerSocket] = None
+		var ds:Option[DatagramSocket] = None
+		try {
+			ss = Option(new ServerSocket(port))
+			for(rs <- ss){
+				rs.setReuseAddress(true)
+			}
+			ds = Option(new DatagramSocket(port))
+			for(dr <- ds){
+				dr.setReuseAddress(true)
+			}
+			return true;
+		} catch {
+			case e:IOException =>
+				for(rs <- ss){
+					rs.close()
+				}
+				for(dr <- ds){
+					dr.close()
+				}
+			case t:Throwable => throw t
+		}
+		false
+	}
 }
