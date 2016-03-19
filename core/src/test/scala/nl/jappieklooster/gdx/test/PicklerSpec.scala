@@ -2,7 +2,7 @@ package nl.jappieklooster.gdx.test
 
 import org.scalatest.{Matchers, FlatSpec}
 import scala.pickling.Defaults._
-import scala.pickling.json._
+import scala.pickling.binary._
 
 class PicklerSpec extends FlatSpec with Matchers{
 	case class Figure(bones:Seq[OvalShape])

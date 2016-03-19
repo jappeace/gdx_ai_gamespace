@@ -25,9 +25,6 @@ import akka.util.ByteString
 import nl.jappieklooster.gdx.mapstare.{Logging, Game}
 import nl.jappieklooster.gdx.mapstare.model.{WorldState, World}
 
-import scala.pickling.Defaults._
-import scala.pickling.json._
-import scala.pickling.static._
 import akka.io._
 
 /**
@@ -46,18 +43,7 @@ class UpdateClient(game:Game) extends Actor with Logging{
 
   def ready(socket: ActorRef): Receive = {
     case Udp.Received(data, remote) =>
-		val json = data.map(_.toChar).mkString
-		try {
-			game.world = json.unpickle[WorldState]
-		}catch{
-			case b:InstantiationException =>
-				log.info(s"couldn't instantiate: $json")
-				throw b
-			case c:ClassCastException =>
-				log.info(s"couldn't cast: $json")
-				throw c
-			case x:Throwable => throw x
-		}
+			game.world = Serializer.deserialize[WorldState](data)
     case Udp.Unbind  => socket ! Udp.Unbind
     case Udp.Unbound => context.stop(self)
   }
