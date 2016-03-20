@@ -61,7 +61,7 @@ class WorldUpdateActor extends Actor with Logging{
 				// the slow parts.
 				if(difference > WorldUpdateActor.minimumReasonableUpdate) {
 					lastTime += difference
-					val tick = GameTick(difference)
+					val tick = GameTick(difference/1000)
 
 					updater.update(tick)
 

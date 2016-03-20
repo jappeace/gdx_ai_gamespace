@@ -54,7 +54,6 @@ class WorldBroadcastActor extends Actor with Logging{
 			val now = System.currentTimeMillis()
 			if(relevance > now) {
 
-				log.info(s"relevant($relevance,$now)")
 				val message = Serializer.serialize(world)
 				if (message != lastSend) { // drop duplicates
 
