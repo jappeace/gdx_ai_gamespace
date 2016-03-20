@@ -17,8 +17,11 @@
 
 package nl.jappieklooster.gdx.mapstare.model
 
+import nl.jappieklooster.gdx.mapstare.akka.server.WorldUpdateActor
 import nl.jappieklooster.gdx.mapstare.model.math._
 import nl.jappieklooster.gdx.mapstare.controller.{DoNothing, Move}
+import squants.time.Milliseconds
+import squants.Time
 
 // swordman, archers, ents...
 // called inidividual cause unit is occipied by scala
@@ -34,9 +37,10 @@ case class Individual(
 		location:Point,
 		controller:IndividualController = DoNothing,
 		selected:Boolean = false,
-		livingTime:Float = 0 // in seconds, used for animations for example,
+		birthTime:Time = Milliseconds(0) // used for animations for example.
 ) extends Positionable{
 	override def position = location
+	def livingTime = WorldUpdateActor.now - birthTime
 }
 
 object Individual{

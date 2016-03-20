@@ -31,6 +31,7 @@ import com.badlogic.gdx.{InputMultiplexer, Input, ApplicationAdapter, Gdx}
 import com.badlogic.gdx.graphics._
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, BitmapFont}
 import nl.jappieklooster.gdx.mapstare.akka._
+import nl.jappieklooster.gdx.mapstare.akka.server.WorldUpdateActor
 import nl.jappieklooster.gdx.mapstare.controller.Updater
 import nl.jappieklooster.gdx.mapstare.input.gui.OnClick
 import nl.jappieklooster.gdx.mapstare.input._
@@ -41,6 +42,7 @@ import nl.jappieklooster.gdx.mapstare.controller._
 
 import com.badlogic.gdx.math._
 import org.slf4j.LoggerFactory
+import squants.time.Milliseconds
 
 class Game() extends ApplicationAdapter {
 	lazy val batch = new SpriteBatch()
@@ -82,7 +84,12 @@ class Game() extends ApplicationAdapter {
 	val updateActor = new ActorFacade
 	private val log = LoggerFactory.getLogger(classOf[Game])
 	override def render() = {
-		update(GameTick(Gdx.graphics.getDeltaTime))
+		update(
+			GameTick(
+				Milliseconds(Gdx.graphics.getDeltaTime),
+				WorldUpdateActor.runningTime
+			)
+		)
 
 		val pos = cam.mouseScreenPos()
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)

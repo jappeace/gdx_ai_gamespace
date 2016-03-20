@@ -18,6 +18,7 @@
 package nl.jappieklooster.gdx.mapstare.controller
 
 import nl.jappieklooster.gdx.mapstare.model.GameTick
+import squants.time.Milliseconds
 
 trait Updateable {
 	/**
@@ -28,9 +29,9 @@ trait Updateable {
 	def update(tick:GameTick):Boolean
 }
 trait IntervalledUpdatable extends Updateable{
-	private var frametime = 0.2f
-	protected def setFrametime(to:Float) = frametime = to
-	private var counter = 0f
+	private var frametime = Milliseconds(200)
+	protected def setFrametime(to:Float) = frametime = Milliseconds(to)
+	private var counter = Milliseconds(0)
 	private var result = true
 	override def update(tick:GameTick):Boolean= {
 		counter += tick.timeSinceLastFrame

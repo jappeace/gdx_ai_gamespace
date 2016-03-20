@@ -38,7 +38,7 @@ case class Move(speed:Point) extends IndividualController{
 		if(speed == Point.zero){
 			return DoNothing(gameTick, ind)
 		}
-		ind.copy(location=ind.location+speed * gameTick.timeSinceLastFrame)
+		ind.copy(location=ind.location+speed * gameTick.timeSinceLastFrame.toSeconds.toFloat)
 	}
 }
 object Move{

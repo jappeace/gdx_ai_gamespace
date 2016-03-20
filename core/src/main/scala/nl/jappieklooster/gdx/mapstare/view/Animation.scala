@@ -33,7 +33,7 @@ class Animation(frametime:Float, sprites:Seq[Sprite])(implicit cam:Cam) {
 	// FIXME: different unit types
 	def render(individual: Individual, spriteBatch:SpriteBatch) = {
 		val position = individual.position - cam.getPosition.topLeftPixels
-		val currentFrame = ((individual.livingTime % ((sprites.length-1)*frametime))/frametime).toInt
+		val currentFrame = ((individual.livingTime.toSeconds % ((sprites.length-1)*frametime))/frametime).toInt
 		val sprite = sprites(currentFrame)
 		sprite.setPosition(position.x, position.y)
 		sprite.draw(spriteBatch)

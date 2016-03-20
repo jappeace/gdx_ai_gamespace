@@ -25,6 +25,8 @@ import akka.util.ByteString
 import nl.jappieklooster.gdx.mapstare.Logging
 import nl.jappieklooster.gdx.mapstare.akka.Serializer
 import nl.jappieklooster.gdx.mapstare.model.WorldState
+import squants.Time
+import squants.time.Milliseconds
 
 /**
   * This the actor that keeps shouting the world state to everyone.
@@ -50,8 +52,7 @@ class WorldBroadcastActor extends Actor with Logging{
 		case BroadCast(sendTime, world) =>
 			// drop ancient messages
 			val relevance = sendTime + WorldBroadcastActor.mimimunRelevance
-			val now = System.currentTimeMillis()
-			if(relevance > now) {
+			if(relevance > WorldUpdateActor.now) {
 
 				val message = Serializer.serialize(world)
 				if (message != lastSend) { // drop duplicates
@@ -65,10 +66,11 @@ class WorldBroadcastActor extends Actor with Logging{
 		case RegisterUpdateClient(path) =>
 			log.info(s"registering $path")
 			updateClients = path +: updateClients
+			lastSend = ByteString.empty
 
 	}
 }
 object WorldBroadcastActor{
-	val mimimunRelevance = 2
+	val mimimunRelevance = Milliseconds(2)
 }
-case class BroadCast(sendTime:Long, world:WorldState)
+case class BroadCast(sendTime:Time, world:WorldState)

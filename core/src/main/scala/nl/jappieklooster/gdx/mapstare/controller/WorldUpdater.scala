@@ -34,17 +34,7 @@ class WorldUpdater(val world:World) extends Updateable {
 	 */
 	override def update(tick: GameTick): Boolean = {
 		// make all units ~~move~~ do shit.
-		world.mapUnits(x=> {
-			val result = x.controller(tick, x)
-			// update time
-			result.copy(livingTime = {
-				var time = tick.timeSinceLastFrame + result.livingTime
-				if(time < 0){ // overflow
-					time = 0
-				}
-				time
-			})
-		})
+		world.mapUnits(x=>x.controller(tick, x))
 		// always keep the updater active
 		true
 	}

@@ -25,6 +25,7 @@ import nl.jappieklooster.gdx.mapstare.controller.{MoveTo, WorldUpdater}
 import nl.jappieklooster.gdx.mapstare.input.SelectionBox
 import nl.jappieklooster.gdx.mapstare.model._
 import nl.jappieklooster.gdx.mapstare.model.math.Rectangle
+import squants.time.Milliseconds
 
 /**
   * This actor is boss of the world.
@@ -37,14 +38,15 @@ class WorldUpdateActor extends Actor with Logging{
 	val world = new World()
 	val updater = new WorldUpdater(world)
 	private var started = false
-	private var lastTime = 0L
+	private var lastTime = Milliseconds(0)
+	import WorldUpdateActor._
 	override def receive: Receive = {
-		case WorldUpdateActor.Start =>
+		case Start =>
 			started = true
-			lastTime = System.currentTimeMillis()
+			lastTime = now
 			self ! Update
 
-		case WorldUpdateActor.Stop =>
+		case Stop =>
 			started = false
 
 		// We received a tick, update the world and the latest state
@@ -52,14 +54,17 @@ class WorldUpdateActor extends Actor with Logging{
 			if(!started){
 				log.info("STOPPED! Ignoring gametick")
 			}else{
-				val difference = System.currentTimeMillis() - lastTime
+				val difference = now - lastTime
 
 				// we require a minimum reasonable update to give the desirializers
 				// time to catch up. Turns out that with small worlds those are
 				// the slow parts.
 				if(difference > WorldUpdateActor.minimumReasonableUpdate) {
 					lastTime += difference
-					val tick = GameTick((difference.toDouble/1000).toFloat)
+					val tick = GameTick(
+						timeSinceLastFrame = difference,
+						runningTime = runningTime
+					)
 
 					updater.update(tick)
 
@@ -69,6 +74,7 @@ class WorldUpdateActor extends Actor with Logging{
 					broadcaster ! BroadCast(lastTime, newWorld)
 				}
 				self ! Update
+				Thread.`yield`()
 			}
 
 		case Create(unit:Positionable) =>
@@ -91,7 +97,10 @@ class WorldUpdateActor extends Actor with Logging{
 object WorldUpdateActor{
 	case object Start
 	case object Stop
-	val minimumReasonableUpdate = 1000/60 //ms
+	val minimumReasonableUpdate = Milliseconds(1000 / 60) //ms
+	def now = Milliseconds(System.currentTimeMillis())
+	val startTime = now
+	def runningTime = now - startTime
 }
 case class Create[T <: Positionable](what:T)
 case class RegisterUpdateClient(name:InetSocketAddress)

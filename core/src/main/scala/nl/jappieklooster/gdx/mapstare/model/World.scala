@@ -17,6 +17,8 @@
 
 package nl.jappieklooster.gdx.mapstare.model
 
+import nl.jappieklooster.gdx.mapstare.akka.server.WorldUpdateActor
+
 import scala.collection.mutable.ArrayBuffer
 
 class World(from:WorldState = World.empty) {
@@ -29,7 +31,7 @@ class World(from:WorldState = World.empty) {
 	}
 	def insert(positionable: Positionable) = {
 		positionable match {
-			case unit:Individual => units = unit +: units
+			case unit:Individual => units = unit.copy(birthTime = WorldUpdateActor.runningTime) +: units
 			case ent:Entity => entities = ent +: entities
 		}
 	}
