@@ -15,17 +15,16 @@
 // along with this program.If not, see <http://www.gnu.org/licenses/>.
 
 
-package nl.jappieklooster.gdx.mapstare.akka
+package nl.jappieklooster.gdx.mapstare.akka.server
 
 import java.net.InetSocketAddress
 
-import akka.actor.{ActorRef, ActorPath, ActorSelection, Actor}
+import akka.actor.{Actor, ActorRef}
 import akka.io._
 import akka.util.ByteString
 import nl.jappieklooster.gdx.mapstare.Logging
-import nl.jappieklooster.gdx.mapstare.model.{Entity, WorldState, World}
-
-import scala.util.Random
+import nl.jappieklooster.gdx.mapstare.akka.Serializer
+import nl.jappieklooster.gdx.mapstare.model.WorldState
 
 /**
   * This the actor that keeps shouting the world state to everyone.

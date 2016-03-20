@@ -24,7 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui._
 import com.badlogic.gdx.math.Vector2
 import nl.jappieklooster.gdx.mapstare.Cam
-import nl.jappieklooster.gdx.mapstare.akka.Create
+import nl.jappieklooster.gdx.mapstare.akka.server.Create
 import nl.jappieklooster.gdx.mapstare.controller.{Updateable, Updater}
 import nl.jappieklooster.gdx.mapstare.input.gui.OnClick
 import nl.jappieklooster.gdx.mapstare.input.{PlacementClick, SelectionBox, CamMovement}

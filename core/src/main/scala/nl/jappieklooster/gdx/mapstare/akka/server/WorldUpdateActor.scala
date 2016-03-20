@@ -15,18 +15,16 @@
 // along with this program.If not, see <http://www.gnu.org/licenses/>.
 
 
-package nl.jappieklooster.gdx.mapstare.akka
+package nl.jappieklooster.gdx.mapstare.akka.server
 
 import java.net.InetSocketAddress
 
 import akka.actor._
-import akka.actor.Actor.Receive
 import nl.jappieklooster.gdx.mapstare.Logging
 import nl.jappieklooster.gdx.mapstare.controller.{MoveTo, WorldUpdater}
 import nl.jappieklooster.gdx.mapstare.input.SelectionBox
 import nl.jappieklooster.gdx.mapstare.model._
 import nl.jappieklooster.gdx.mapstare.model.math.Rectangle
-import org.slf4j.LoggerFactory
 
 /**
   * This actor is boss of the world.

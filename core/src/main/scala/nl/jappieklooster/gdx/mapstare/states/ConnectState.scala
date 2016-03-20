@@ -20,12 +20,15 @@ package nl.jappieklooster.gdx.mapstare.states
 import java.net.{InetSocketAddress, InetAddress}
 
 import akka.actor._
+import akka.routing.RoundRobinRouter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.typesafe.config.ConfigFactory
 import nl.jappieklooster.gdx.mapstare.Game
 import nl.jappieklooster.gdx.mapstare.akka._
+import nl.jappieklooster.gdx.mapstare.akka.client.WorldStateUDPDeserializeActor
+import nl.jappieklooster.gdx.mapstare.akka.server.{RegisterUpdateClient, WorldUpdateActor}
 import nl.jappieklooster.gdx.mapstare.controller.{Updateable, Updater}
 import nl.jappieklooster.gdx.mapstare.input.gui.OnClick
 import nl.jappieklooster.gdx.mapstare.model.GameTick
@@ -65,10 +68,10 @@ class ConnectState(game:Game) extends GameState(game){
 			val updateActor =  sys.actorOf(Props[WorldUpdateActor], updateActorName)
 			log.info(s"creating update actor: ${updateActor.path.toStringWithAddress(Address("akka.tcp", updateSys, "localhost", 2552))}")
 			game.updateActor.actor = Option(sys.actorSelection(updateActor.path))
-			val client = sys.actorOf(Props(new UpdateClient(game)).withDispatcher("gdx-dispatcher"), UpdateClient.name)
+			val client = sys.actorOf(Props(new WorldStateUDPDeserializeActor(game)), WorldStateUDPDeserializeActor.name)
 			import akka.io._
 
-			changeState(UpdateClient.localhost)
+			changeState(WorldStateUDPDeserializeActor.localhost)
 			updateActor ! WorldUpdateActor.Start
 		}))
 		val connect = factory.button("Connect")
@@ -78,8 +81,8 @@ class ConnectState(game:Game) extends GameState(game){
 			val my = myIpField.getText
 			val port = 2552
 			game.updateActor.actor = Option(sys.actorSelection(s"akka.tcp://$updateSys@$ip:$port/user/$updateActorName"))
-			val client = sys.actorOf(Props(new UpdateClient(game)).withDispatcher("gdx-dispatcher"), UpdateClient.name)
-			changeState(UpdateClient.localhost)
+			val client = sys.actorOf(Props(new WorldStateUDPDeserializeActor(game)), WorldStateUDPDeserializeActor.name)
+			changeState(WorldStateUDPDeserializeActor.localhost)
 		}))
 		container.add(host)
 		container.add(connect)

@@ -15,17 +15,20 @@
 // along with this program.If not, see <http://www.gnu.org/licenses/>.
 
 
-package nl.jappieklooster.gdx.mapstare.akka
+package nl.jappieklooster.gdx.mapstare.akka.client
 
-import java.net.{DatagramSocket, ServerSocket, InetSocketAddress}
+import java.net.{DatagramSocket, InetSocketAddress, ServerSocket}
 
-import akka.actor.{ActorRef, Actor}
-import akka.actor.Actor.Receive
-import akka.util.ByteString
-import nl.jappieklooster.gdx.mapstare.{Logging, Game}
-import nl.jappieklooster.gdx.mapstare.model.{WorldState, World}
-
+import akka.actor.{Props, Actor, ActorRef}
+import akka.dispatch.BoundedMessageQueueSemantics
 import akka.io._
+import nl.jappieklooster.gdx.mapstare.akka.Serializer
+import nl.jappieklooster.gdx.mapstare.model.WorldState
+import nl.jappieklooster.gdx.mapstare.{Game, Logging}
+
+
+import akka.dispatch.RequiresMessageQueue
+import akka.dispatch.BoundedMessageQueueSemantics
 
 /**
   * This guy should run on the same thread as the render loop and updates
@@ -34,8 +37,9 @@ import akka.io._
   *
   * @param game
   */
-class UpdateClient(game:Game) extends Actor with Logging{
-	IO(Udp)(context.system) ! Udp.Bind(self, UpdateClient.localhost)
+class WorldStateUDPDeserializeActor(game:Game) extends Actor with Logging with RequiresMessageQueue[BoundedMessageQueueSemantics] {
+	IO(Udp)(context.system) ! Udp.Bind(self, WorldStateUDPDeserializeActor.localhost)
+	val gameThreadSyncer = context.actorOf(Props(new WorldStateToGameActor(game)).withDispatcher("gdx-dispatcher"))
 	def receive = {
 		case Udp.Bound(local) =>
 			context.become(ready(sender()))
@@ -43,12 +47,12 @@ class UpdateClient(game:Game) extends Actor with Logging{
 
 	def ready(socket: ActorRef): Receive = {
 		case Udp.Received(data, remote) =>
-			game.world = Serializer.deserialize[WorldState](data)
+			gameThreadSyncer ! Serializer.deserialize[WorldState](data)
 		case Udp.Unbind  => socket ! Udp.Unbind
 		case Udp.Unbound => context.stop(self)
 	}
 }
-object  UpdateClient{
+object  WorldStateUDPDeserializeActor{
 	val name = "updateClient"
 	val minPort = 1100
 	val maxPort = 49151
