@@ -50,12 +50,16 @@ class UpdateClient(game:Game) extends Actor with Logging{
 }
 object  UpdateClient{
 	val name = "updateClient"
-	val localhost = {
-
-		new InetSocketAddress("localhost", 2554)
-	}
 	val minPort = 1100
 	val maxPort = 49151
+	val localhost = {
+
+		var port = minPort
+		while(!available(port)) {
+			port += 1
+		}
+		new InetSocketAddress("localhost", port)
+	}
 	/**
 	  * Checks to see if a specific port is available.
 	  *
@@ -71,11 +75,11 @@ object  UpdateClient{
 		try {
 			ss = Option(new ServerSocket(port))
 			for(rs <- ss){
-				rs.setReuseAddress(true)
+				rs.close()
 			}
 			ds = Option(new DatagramSocket(port))
 			for(dr <- ds){
-				dr.setReuseAddress(true)
+				dr.close()
 			}
 			return true;
 		} catch {
