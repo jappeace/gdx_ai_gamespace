@@ -21,8 +21,12 @@ import java.net.InetSocketAddress
 
 import akka.actor.{ActorRef, ActorPath, ActorSelection, Actor}
 import akka.io._
+import akka.util.ByteString
 import nl.jappieklooster.gdx.mapstare.Logging
 import nl.jappieklooster.gdx.mapstare.model.{Entity, WorldState, World}
+
+import scala.util.Random
+
 /**
   * This the actor that keeps shouting the world state to everyone.
   * So it receives a simple world state from another actor and will send it
@@ -33,6 +37,7 @@ class WorldBroadcastActor extends Actor with Logging{
 	private var updateClients:Seq[InetSocketAddress] = Nil
 
 	IO(Udp)(context.system) ! Udp.SimpleSender
+	private var lastSend = ByteString.empty
 	override def receive: Receive = {
 		case Udp.SimpleSenderReady =>
 			log.info("starting with sending")
@@ -43,13 +48,29 @@ class WorldBroadcastActor extends Actor with Logging{
 
 	}
 	def broadcasting(socket:ActorRef):Receive = {
-		case world:WorldState =>
-			val message = Serializer.serialize(world)
-			for(client <- updateClients){
-				socket ! Udp.Send(message, client)
+		case BroadCast(sendTime, world) =>
+			// drop ancient messages
+			val relevance = sendTime + WorldBroadcastActor.mimimunRelevance
+			val now = System.currentTimeMillis()
+			if(relevance > now) {
+
+				log.info(s"relevant($relevance,$now)")
+				val message = Serializer.serialize(world)
+				if (message != lastSend) { // drop duplicates
+
+					lastSend = message
+					for (client <- updateClients) {
+						socket ! Udp.Send(message, client)
+					}
+				}
 			}
 		case RegisterUpdateClient(path) =>
 			log.info(s"registering $path")
 			updateClients = path +: updateClients
+
 	}
 }
+object WorldBroadcastActor{
+	val mimimunRelevance = 2
+}
+case class BroadCast(sendTime:Long, world:WorldState)

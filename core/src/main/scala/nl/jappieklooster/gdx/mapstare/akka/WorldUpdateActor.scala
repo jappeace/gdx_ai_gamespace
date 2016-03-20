@@ -38,15 +38,40 @@ class WorldUpdateActor extends Actor with Logging{
 	val broadcaster = context.system.actorOf(Props[WorldBroadcastActor])
 	val world = new World()
 	val updater = new WorldUpdater(world)
+	private var started = false
+	private var lastTime = 0L
 	override def receive: Receive = {
-		// We received a tick, update the world and the latest state
-		case tick:GameTick =>
-			updater.update(tick)
+		case WorldUpdateActor.Start =>
+			started = true
+			lastTime = System.currentTimeMillis()
+			self ! Update
 
-			// It is possible to send the entire state, because the gametick
-			// message should *not* be send over a network.
-			val newWorld = updater.world.copy()
-			broadcaster ! newWorld
+		case WorldUpdateActor.Stop =>
+			started = false
+
+		// We received a tick, update the world and the latest state
+		case Update =>
+			if(!started){
+				log.info("STOPPED! Ignoring gametick")
+			}else{
+				val difference = System.currentTimeMillis() - lastTime
+
+				// we require a minimum reasonable update to give the desirializers
+				// time to catch up. Turns out that with small worlds those are
+				// the slow parts.
+				if(difference > WorldUpdateActor.minimumReasonableUpdate) {
+					lastTime += difference
+					val tick = GameTick(difference)
+
+					updater.update(tick)
+
+					// It is possible to send the entire state, because the gametick
+					// message should *not* be send over a network.
+					val newWorld = updater.world.copy()
+					broadcaster ! BroadCast(lastTime, newWorld)
+				}
+				self ! Update
+			}
 
 		case Create(unit:Positionable) =>
 			log.info(s"creating $unit")
@@ -63,6 +88,12 @@ class WorldUpdateActor extends Actor with Logging{
 		case x:RegisterUpdateClient => broadcaster ! x
 		case _ => log.warn(s"received unkown message")
 	}
+	private case object Update
+}
+object WorldUpdateActor{
+	case object Start
+	case object Stop
+	val minimumReasonableUpdate = 1000/60 //ms
 }
 case class Create[T <: Positionable](what:T)
 case class RegisterUpdateClient(name:InetSocketAddress)

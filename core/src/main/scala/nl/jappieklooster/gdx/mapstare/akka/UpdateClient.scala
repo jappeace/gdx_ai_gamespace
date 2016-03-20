@@ -36,17 +36,17 @@ import akka.io._
   */
 class UpdateClient(game:Game) extends Actor with Logging{
 	IO(Udp)(context.system) ! Udp.Bind(self, UpdateClient.localhost)
-  def receive = {
-    case Udp.Bound(local) =>
-      context.become(ready(sender()))
-  }
+	def receive = {
+		case Udp.Bound(local) =>
+			context.become(ready(sender()))
+	}
 
-  def ready(socket: ActorRef): Receive = {
-    case Udp.Received(data, remote) =>
+	def ready(socket: ActorRef): Receive = {
+		case Udp.Received(data, remote) =>
 			game.world = Serializer.deserialize[WorldState](data)
-    case Udp.Unbind  => socket ! Udp.Unbind
-    case Udp.Unbound => context.stop(self)
-  }
+		case Udp.Unbind  => socket ! Udp.Unbind
+		case Udp.Unbound => context.stop(self)
+	}
 }
 object  UpdateClient{
 	val name = "updateClient"

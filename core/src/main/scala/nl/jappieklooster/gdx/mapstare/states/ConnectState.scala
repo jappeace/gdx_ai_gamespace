@@ -25,7 +25,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.typesafe.config.ConfigFactory
 import nl.jappieklooster.gdx.mapstare.Game
-import nl.jappieklooster.gdx.mapstare.akka.{WorldBroadcastActor, RegisterUpdateClient, UpdateClient, WorldUpdateActor}
+import nl.jappieklooster.gdx.mapstare.akka._
 import nl.jappieklooster.gdx.mapstare.controller.{Updateable, Updater}
 import nl.jappieklooster.gdx.mapstare.input.gui.OnClick
 import nl.jappieklooster.gdx.mapstare.model.GameTick
@@ -64,15 +64,12 @@ class ConnectState(game:Game) extends GameState(game){
 			val sys = ActorSystem(updateSys, ConfigFactory.load("host"))
 			val updateActor =  sys.actorOf(Props[WorldUpdateActor], updateActorName)
 			log.info(s"creating update actor: ${updateActor.path.toStringWithAddress(Address("akka.tcp", updateSys, "localhost", 2552))}")
-			game.updater.add((tick:GameTick) => {
-				updateActor ! tick
-				true
-			})
 			game.updateActor.actor = Option(sys.actorSelection(updateActor.path))
 			val client = sys.actorOf(Props(new UpdateClient(game)).withDispatcher("gdx-dispatcher"), UpdateClient.name)
 			import akka.io._
 
 			changeState(UpdateClient.localhost)
+			updateActor ! WorldUpdateActor.Start
 		}))
 		val connect = factory.button("Connect")
 		connect.addListener(OnClick({
